@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Plex Content</title>
+</head>
+<body>
+    <h1>Movies</h1>
+    <ul>
+        {% for movie in movies %}
+            <li>{{ movie.title }} ({{ movie.year }})</li>
+        {% endfor %}
+    </ul>
+
+    <h1>TV Shows</h1>
+    <ul>
+        {% for show in shows %}
+            <li>{{ show.title }} ({{ show.year }})</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

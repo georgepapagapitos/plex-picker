@@ -1,0 +1,50 @@
+{% extends "picker/base.html" %}
+
+{% block title %}Random Movie Picker{% endblock %}
+
+{% block content %}
+    <!-- Genre and count selection form -->
+    <form method="GET" action="{% url 'fetch_random_movie' %}">
+        <label for="genre">Select Genre:</label>
+        <select name="genre" id="genre">
+            <option value="" {% if selected_genre == "" %}selected{% endif %}>Any</option>
+            {% for genre in genres %}
+                <option value="{{ genre }}" {% if selected_genre == genre %}selected{% endif %}>{{ genre }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="count">Number of Movies:</label>
+        <select name="count" id="count">
+            <option value="1" {% if count == 1 %}selected{% endif %}>1</option>
+            <option value="2" {% if count == 2 %}selected{% endif %}>2</option>
+            <option value="3" {% if count == 3 %}selected{% endif %}>3</option>
+        </select>
+
+        <button type="submit">Pick Random Movies</button>
+    </form>
+
+    <!-- Check if movies exist -->
+    {% if movies %}
+        <div class="movies-container">
+            {% for movie in movies %}
+                <div class="movie-container">
+                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }} Poster" />
+                    <div class="movie-details">
+                        <h2>{{ movie.title }}</h2>
+                        <p><strong>Year:</strong> {{ movie.year }}</p>
+                        <p><strong>Summary:</strong> {{ movie.summary }}</p>
+                    </div>
+                    {% if movie.trailer_url %}
+                        <div class="trailer-container">
+                            <iframe src="https://www.youtube.com/embed/{{ movie.trailer_url|slice:'-11:' }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                    {% else %}
+                        <p><strong>Watch Trailer:</strong> Trailer not available</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No movies found. Please select a genre and number of movies, then try again.</p>
+    {% endif %}
+{% endblock %}
