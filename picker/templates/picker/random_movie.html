@@ -23,26 +23,36 @@
         <button type="submit">Pick Random Movies</button>
     </form>
 
+    <!-- Loading spinner and message -->
+    <div id="loading" class="loading">
+        <p>Picking random movies...</p>
+        <div class="spinner"></div>
+    </div>
+
     <!-- Check if movies exist -->
     {% if movies %}
-        <div class="movies-container">
+        <div class="movies-container" id="moviesContainer">
             {% for movie in movies %}
                 <div class="movie-container">
-                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }} Poster" />
+                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }} Poster" class="movie-poster" />
                     <div class="movie-details">
-                        <h2>{{ movie.title }}</h2>
-                        <p><strong>Year:</strong> {{ movie.year }}</p>
+                        <h2>{{ movie.title }} ({{ movie.year }})</h2>
                         <p><strong>Summary:</strong> {{ movie.summary }}</p>
                     </div>
                     {% if movie.trailer_url %}
-                        <div class="trailer-container">
-                            <iframe src="https://www.youtube.com/embed/{{ movie.trailer_url|slice:'-11:' }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                        </div>
+                        <button class="trailer-button" data-trailer-url="https://www.youtube.com/embed/{{ movie.trailer_url|slice:'-11:' }}">Watch Trailer</button>
                     {% else %}
                         <p><strong>Watch Trailer:</strong> Trailer not available</p>
                     {% endif %}
                 </div>
             {% endfor %}
+        </div>
+
+        <div id="trailerModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <iframe id="trailerIframe" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
         </div>
     {% else %}
         <p>No movies found. Please select a genre and number of movies, then try again.</p>

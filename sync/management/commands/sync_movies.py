@@ -35,7 +35,6 @@ class Command(BaseCommand):
                 plex_key = plex_movie.ratingKey
 
                 tmdb_id = None
-                tmdb_id = None
                 for guid in plex_movie.guids:
                     if guid.id.startswith("tmdb://"):
                         tmdb_id = int(guid.id.split("/")[-1])

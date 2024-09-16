@@ -100,13 +100,15 @@ button:hover {
 }
 
 /* Movie container */
+/* Movie container */
 .movies-container {
     display: flex;
     flex-wrap: wrap;
     gap: 20px; /* Space between movie containers */
-    justify-content: center;
+    justify-content: center; /* Center-align movie containers */
 }
 
+/* Movie container */
 .movie-container {
     display: flex;
     flex-direction: column;
@@ -117,7 +119,31 @@ button:hover {
     max-width: 300px;
     width: 100%;
     margin-bottom: 20px;
-    position: relative; /* For positioning trailer container */
+    position: relative;
+    text-align: center; /* Center-align text and buttons */
+}
+
+/* Poster styling */
+.movie-poster {
+    display: block;
+    margin: 0 auto; /* Center-align poster image */
+}
+
+/* Movie details */
+.movie-details {
+    margin-top: 20px;
+    text-align: center;
+    margin-bottom: 20px; /* Add margin between movie title and poster */
+}
+
+/* Movie title */
+.movie-details h2 {
+    margin-bottom: 15px; /* Add margin between title and poster */
+}
+
+/* Adjust the button container */
+.trailer-button {
+    margin-top: auto; /* Pushes the button to the bottom of the container */
 }
 
 /* Poster styling */
@@ -180,4 +206,85 @@ img {
     img {
         max-width: 200px;
     }
+}
+
+/* Modal styles */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.5); /* Black with opacity */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Could be more or less, depending on screen size */
+    max-width: 800px;
+    position: relative;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#trailerIframe {
+    width: 100%;
+    height: 450px; /* Adjust height as needed */
+}
+
+/* Loading Spinner Styles */
+.loading {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--background-color);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    z-index: 1000;
+    width: 100%;
+    max-width: 300px;
+}
+
+.loading p {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.spinner {
+    border: 8px solid #f3f3f3; /* Light grey */
+    border-top: 8px solid var(--primary-color); /* Primary color */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Hide loading spinner when images are loaded */
+#moviesContainer {
+    display: none;
 }
