@@ -1,13 +1,11 @@
-import logging
-
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from plexapi.server import PlexServer
 
-from sync.models import Movie  # Import your Movie model
+from sync.models import Movie
+from utils.logger_utils import setup_logging
 
-# Set up logging
-logger = logging.getLogger(__name__)
+logger = setup_logging(__name__)
 
 
 class Command(BaseCommand):

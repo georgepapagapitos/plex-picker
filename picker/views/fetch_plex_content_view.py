@@ -4,9 +4,9 @@ from django.conf import settings
 from django.shortcuts import render
 from plexapi.server import PlexServer
 
-# Set up logging
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG)
+from utils.logger_utils import setup_logging
+
+logger = setup_logging(__name__)
 
 
 def fetch_plex_content(request):
