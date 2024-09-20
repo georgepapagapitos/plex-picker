@@ -101,7 +101,7 @@ def fetch_random_movie(request):
             "count": count,
             "movie_ids": movie_ids,
         }
-        return render(request, "picker/random_movie.html", context)
+        return render(request, "random_movie.html", context)
 
     except Exception as e:
         # Log any exceptions that occur during processing
