@@ -20,6 +20,8 @@
             <option value="3" {% if count == 3 %}selected{% endif %}>3</option>
         </select>
 
+        <input type="hidden" name="randomize" value="true">
+        <input type="hidden" name="movies" value="{{ movie_ids }}">
         <button type="submit">Pick Random Movies</button>
     </form>
 
@@ -37,7 +39,7 @@
                     <img src="{{ movie.poster_url }}" alt="{{ movie.title }} Poster" class="movie-poster" />
                     <div class="movie-details">
                         <h2>{{ movie.title }} ({{ movie.year }})</h2>
-                        <p><strong>Summary:</strong> {{ movie.summary }}</p>
+                        <p>{{ movie.summary }}</p>
                     </div>
                     {% if movie.trailer_url %}
                         <button class="trailer-button" data-trailer-url="https://www.youtube.com/embed/{{ movie.trailer_url|slice:'-11:' }}">Watch Trailer</button>
