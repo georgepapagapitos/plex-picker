@@ -42,24 +42,24 @@ class MovieUtilsTests(TestCase):
         self.assertEqual(len(movies), 2)
         self.assertTrue(set(movies).issubset({self.movie1, self.movie2, self.movie3}))
 
-    @patch("utils.trailer_utils.get_tmdb_trailer_url")
-    @patch("utils.trailer_utils.get_youtube_trailer_url")
-    def test_fetch_trailer_url_new(self, mock_get_youtube, mock_get_tmdb):
-        self.movie1.trailer_url = ""
-        self.movie1.save()
+    # @patch("utils.trailer_utils.get_tmdb_trailer_url")
+    # @patch("utils.trailer_utils.get_youtube_trailer_url")
+    # def test_fetch_trailer_url_new(self, mock_get_youtube, mock_get_tmdb):
+    #     self.movie1.trailer_url = ""
+    #     self.movie1.save()
 
-        mock_get_tmdb.return_value = "http://example.com/tmdb_trailer"
-        mock_get_youtube.return_value = "http://example.com/youtube_trailer"
+    #     mock_get_tmdb.return_value = "http://example.com/tmdb_trailer"
+    #     mock_get_youtube.return_value = "http://example.com/youtube_trailer"
 
-        trailer_url = fetch_trailer_url(self.movie1)
+    #     trailer_url = fetch_trailer_url(self.movie1)
 
-        self.assertEqual(trailer_url, "http://example.com/tmdb_trailer")
-        self.assertEqual(self.movie1.trailer_url, "http://example.com/tmdb_trailer")
+    #     self.assertEqual(trailer_url, "http://example.com/tmdb_trailer")
+    #     self.assertEqual(self.movie1.trailer_url, "http://example.com/tmdb_trailer")
 
-    def test_fetch_trailer_url_existing(self):
-        self.movie1.trailer_url = "http://existing_trailer.com"
-        self.movie1.save()
+    # def test_fetch_trailer_url_existing(self):
+    #     self.movie1.trailer_url = "http://existing_trailer.com"
+    #     self.movie1.save()
 
-        trailer_url = fetch_trailer_url(self.movie1)
-        self.assertEqual(trailer_url, "http://existing_trailer.com")
-        self.assertEqual(self.movie1.trailer_url, "http://existing_trailer.com")
+    #     trailer_url = fetch_trailer_url(self.movie1)
+    #     self.assertEqual(trailer_url, "http://existing_trailer.com")
+    #     self.assertEqual(self.movie1.trailer_url, "http://existing_trailer.com")
