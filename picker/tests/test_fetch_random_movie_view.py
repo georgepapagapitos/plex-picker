@@ -8,7 +8,7 @@ from picker.views import (
     get_random_movies,
     get_unique_genres,
 )
-from sync.models import Movie
+from sync.models.movie import Movie
 
 
 class MovieUtilsTests(TestCase):
