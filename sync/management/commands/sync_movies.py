@@ -45,26 +45,28 @@ class Command(BaseCommand):
                         break
 
                 # Check if the movie already exists in the database
-                movie, created = Movie.objects.update_or_create(
-                    plex_key=plex_key,
-                    defaults={
-                        "title": title,
-                        "summary": summary,
-                        "year": year,
-                        "duration": duration,
-                        "rating": rating,
-                        "poster_url": poster_url,
-                        "genres": genres,
-                        "tmdb_id": tmdb_id,
-                        "imdb_rating": imdb_rating,
-                        "rotten_tomatoes_rating": rotten_tomatoes_rating,
-                    },
-                )
+                try:
+                    movie, created = Movie.objects.update_or_create(
+                        plex_key=plex_key,
+                        defaults={
+                            "title": title,
+                            "summary": summary,
+                            "year": year,
+                            "duration": duration,
+                            "rating": rating,
+                            "poster_url": poster_url,
+                            "genres": genres,
+                            "tmdb_id": tmdb_id,
+                            "rotten_tomatoes_rating": rotten_tomatoes_rating,
+                        },
+                    )
 
-                if created:
-                    logger.info(f"Added new movie: {title}")
-                else:
-                    logger.info(f"Updated existing movie: {title}")
+                    if created:
+                        logger.info(f"Added new movie: {title}")
+                    else:
+                        logger.info(f"Updated existing movie: {title}")
+                except Exception as db_error:
+                    logger.error(f"Error saving movie '{title}': {str(db_error)}")
 
             logger.info("Movie sync completed successfully.")
         except Exception as e:

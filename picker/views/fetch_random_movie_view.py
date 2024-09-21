@@ -1,7 +1,7 @@
 from typing import List
 
 from django.db.models import Q, QuerySet
-from django.http import HttpResponseRedirect
+from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
@@ -47,7 +47,7 @@ def fetch_trailer_url(movie: Movie) -> str:
     return movie.trailer_url
 
 
-def fetch_random_movie(request):
+def fetch_random_movie(request: HttpRequest):
     try:
         # Extract query parameters from the request
         selected_genre = request.GET.get("genre", "")
@@ -69,7 +69,7 @@ def fetch_random_movie(request):
 
             if movies.exists():
                 # Ensure the requested count does not exceed the available movies
-                count = max(1, min(count, 3))
+                count = max(1, min(count, 4))
                 selected_movies = get_random_movies(movies, count)
                 movie_ids = ",".join(str(movie.id) for movie in selected_movies)
                 logger.debug(f"Selected movie IDs: {movie_ids}")
