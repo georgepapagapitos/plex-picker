@@ -12,6 +12,8 @@ class Movie(models.Model):
     plex_key = models.CharField(max_length=255, unique=True)
     trailer_url = models.URLField(null=True, blank=True)
     tmdb_id = models.PositiveIntegerField(null=True, blank=True)
+    imdb_rating = models.FloatField(null=True, blank=True)
+    rotten_tomatoes_rating = models.FloatField(null=True, blank=True)
 
     def __str__(self):
         return self.title

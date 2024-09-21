@@ -5,20 +5,23 @@
 {% block content %}
     <!-- Genre and count selection form -->
     <form method="GET" action="{% url 'fetch_random_movie' %}">
-        <label for="genre">Select Genre:</label>
-        <select name="genre" id="genre">
-            <option value="" {% if selected_genre == "" %}selected{% endif %}>Any</option>
-            {% for genre in genres %}
-                <option value="{{ genre }}" {% if selected_genre == genre %}selected{% endif %}>{{ genre }}</option>
-            {% endfor %}
-        </select>
-
-        <label for="count">Number of Movies:</label>
-        <select name="count" id="count">
-            <option value="1" {% if count == 1 %}selected{% endif %}>1</option>
-            <option value="2" {% if count == 2 %}selected{% endif %}>2</option>
-            <option value="3" {% if count == 3 %}selected{% endif %}>3</option>
-        </select>
+        <div class="form-group">
+            <label for="genre">Select Genre:</label>
+            <select name="genre" id="genre">
+                <option value="" {% if selected_genre == "" %}selected{% endif %}>Any</option>
+                {% for genre in genres %}
+                    <option value="{{ genre }}" {% if selected_genre == genre %}selected{% endif %}>{{ genre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="count">Number of Movies:</label>
+            <select name="count" id="count">
+                <option value="1" {% if count == 1 %}selected{% endif %}>1</option>
+                <option value="2" {% if count == 2 %}selected{% endif %}>2</option>
+                <option value="3" {% if count == 3 %}selected{% endif %}>3</option>
+            </select>
+        </div>
 
         <input type="hidden" name="randomize" value="true">
         <input type="hidden" name="movies" value="{{ movie_ids }}">
@@ -40,7 +43,24 @@
                     <div class="movie-details">
                         <h2>{{ movie.title }} ({{ movie.year }})</h2>
                         <p>{{ movie.summary }}</p>
+                        {% if movie.rotten_tomatoes_rating %}
                     </div>
+                    <p class="rotten-tomato-rating"><strong>Rotten Tomatoes:</strong> {{ movie.rotten_tomatoes_rating }}% 
+                        {% if movie.rotten_tomatoes_rating >= 85 %}
+                            🔥 <!-- Excellent Rating -->
+                        {% elif movie.rotten_tomatoes_rating >= 70 %}
+                            😊 <!-- Very Good Rating -->
+                        {% elif movie.rotten_tomatoes_rating >= 60 %}
+                            👍 <!-- Good Rating -->
+                        {% elif movie.rotten_tomatoes_rating >= 50 %}
+                            😐 <!-- Average Rating -->
+                        {% elif movie.rotten_tomatoes_rating >= 40 %}
+                            👎 <!-- Below Average Rating -->
+                        {% else %}
+                            💩 <!-- Poor Rating -->
+                        {% endif %}
+                    </p>
+                    {% endif %}
                     {% if movie.trailer_url %}
                         <button class="trailer-button" data-trailer-url="https://www.youtube.com/embed/{{ movie.trailer_url|slice:'-11:' }}">Watch Trailer</button>
                     {% else %}
@@ -53,6 +73,7 @@
         <div id="trailerModal" class="modal">
             <div class="modal-content">
                 <span class="close">&times;</span>
+                <h3 id="modalMovieTitle"></h3>
                 <iframe id="trailerIframe" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
         </div>

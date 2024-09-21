@@ -32,6 +32,12 @@ class Command(BaseCommand):
                 genres = ", ".join([g.tag for g in plex_movie.genres])
                 plex_key = plex_movie.ratingKey
 
+                rotten_tomatoes_rating = (
+                    plex_movie.audienceRating * 10
+                    if plex_movie.audienceRating
+                    else None
+                )
+
                 tmdb_id = None
                 for guid in plex_movie.guids:
                     if guid.id.startswith("tmdb://"):
@@ -50,6 +56,8 @@ class Command(BaseCommand):
                         "poster_url": poster_url,
                         "genres": genres,
                         "tmdb_id": tmdb_id,
+                        "imdb_rating": imdb_rating,
+                        "rotten_tomatoes_rating": rotten_tomatoes_rating,
                     },
                 )
 

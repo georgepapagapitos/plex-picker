@@ -19,7 +19,7 @@ def get_tmdb_trailer_url(movie_id):
 
         for video in data.get("results", []):
             if video["type"] == "Trailer":
-                return f"https://www.youtube.com/watch?v={video['key']}"
+                return f"https://www.youtube.com/embed/{video['key']}"
 
     except requests.RequestException as e:
         logger.error(f"TMDB API request failed: {str(e)}")

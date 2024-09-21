@@ -3,13 +3,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('trailerModal');
     const iframe = document.getElementById('trailerIframe');
     const closeBtn = document.querySelector('.modal .close');
+    const modalTitle = document.getElementById('modalMovieTitle');
 
     // Open modal when button is clicked
     document.querySelectorAll('.trailer-button').forEach(button => {
         button.addEventListener('click', () => {
             console.log("Button clicked");
             const trailerUrl = button.getAttribute('data-trailer-url');
+            const movieTitle = button.closest('.movie-container').querySelector('h2').innerText; // Get the movie title
+            
             console.log("Trailer URL:", trailerUrl);
+            modalTitle.innerText = movieTitle;
             iframe.src = trailerUrl;
             modal.style.display = 'block';
         });

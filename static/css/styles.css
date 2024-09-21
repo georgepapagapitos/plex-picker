@@ -73,6 +73,13 @@ form {
     text-align: center;
 }
 
+.form-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
 label {
     font-size: 1rem;
     font-weight: bold;
@@ -82,7 +89,7 @@ label {
 select, button {
     font-size: 1rem;
     padding: 10px;
-    margin: 5px;
+    margin: 5px 0;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
@@ -148,9 +155,8 @@ button:hover {
     margin-bottom: 15px;
 }
 
-/* Adjust the button container */
-.trailer-button {
-    margin-top: auto; /* Pushes the button to the bottom of the container */
+.rotten-tomato-rating {
+    margin-top: auto;
 }
 
 /* Poster styling */
