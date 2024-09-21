@@ -1,17 +1,18 @@
-import logging
-
+# trailer_utils.py
 import googleapiclient.discovery
 import requests
 from django.conf import settings
 
+from utils.logger_utils import setup_logging
+
 # Set up logging
-logger = logging.getLogger(__name__)
+logger = setup_logging(__name__)
 
 
 def get_tmdb_trailer_url(movie_id):
     try:
         response = requests.get(
-            f"https://api.themoviedb.org/3/movie/{movie_id}/videos",
+            f"{settings.TMDB_API_URL}/movie/{movie_id}/videos",
             params={"api_key": settings.TMDB_API_KEY},
         )
         response.raise_for_status()  # Raise an exception for HTTP errors
