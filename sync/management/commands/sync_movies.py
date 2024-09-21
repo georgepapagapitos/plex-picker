@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from plexapi.server import PlexServer
 
-from sync.models import Movie
+from sync.models.movie import Movie
 from utils.logger_utils import setup_logging
 
 logger = setup_logging(__name__)

@@ -6,7 +6,7 @@ from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from sync.models import Movie
+from sync.models.movie import Movie
 from utils.logger_utils import setup_logging
 from utils.trailer_utils import get_tmdb_trailer_url, get_youtube_trailer_url
 
