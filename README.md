@@ -1,15 +1,43 @@
 # Plex Picker
 
-- python -m venv venv
+```
+# create virtual environment
 
-- source venv/bin/activate
+python -m venv venv
+```
 
-- pip install -r requirements.txt
+```
+# activate venv
 
-- python manage.py migrate
+source venv/bin/activate
+```
 
-- cp .example.env .env
+```
+# install requirements
 
-- python manage.py sync_movies
+pip install -r requirements.txt
+```
 
-- python manage.py runserver
+```
+# run migrate, this creates local db.sqlite3
+
+python manage.py migrate
+```
+
+```
+# create .env and add secrets
+
+cp .example.env .env
+```
+
+```
+# run sync_movies command to populate db from "Movies" library
+
+python manage.py sync_movies
+```
+
+```
+# run server, navigate to localhost:8000/picker/random-movie
+
+python manage.py runserver
+```
