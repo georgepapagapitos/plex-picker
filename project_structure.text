@@ -1,0 +1,120 @@
+- .env
+- .example.env
+- .github
+  - workflows
+    - django.yml
+    - pylint.yml
+- .gitignore
+- README.md
+- db.sqlite3
+- manage.py
+- picker
+  - __init__.py
+  - __pycache__
+    - __init__.cpython-312.pyc
+    - admin.cpython-312.pyc
+    - apps.cpython-312.pyc
+    - models.cpython-312.pyc
+    - test_fetch_random_movie_view.cpython-312.pyc
+    - urls.cpython-312.pyc
+  - admin.py
+  - apps.py
+  - migrations
+    - __init__.py
+    - __pycache__
+      - __init__.cpython-312.pyc
+  - models.py
+  - templates
+    - base.html
+    - error.html
+    - plex_content.html
+    - random_movie.html
+  - tests
+    - __init__.py
+    - __pycache__
+      - __init__.cpython-312.pyc
+      - test_fetch_random_movie_view.cpython-312.pyc
+    - test_fetch_random_movie_view.py
+  - urls.py
+  - views
+    - __init__.py
+    - __pycache__
+      - __init__.cpython-312.pyc
+      - fetch_plex_content_view.cpython-312.pyc
+      - fetch_random_movie_view.cpython-312.pyc
+      - home_view.cpython-312.pyc
+    - fetch_plex_content_view.py
+    - fetch_random_movie_view.py
+- plexpicker
+  - __init__.py
+  - __pycache__
+    - __init__.cpython-312.pyc
+    - settings.cpython-312.pyc
+    - urls.cpython-312.pyc
+    - wsgi.cpython-312.pyc
+  - asgi.py
+  - settings.py
+  - urls.py
+  - wsgi.py
+- project_structure.text
+- requirements.txt
+- static
+  - css
+    - styles.css
+  - js
+    - modal.js
+    - spinner.js
+- sync
+  - __init__.py
+  - __pycache__
+    - __init__.cpython-312 2.pyc
+    - __init__.cpython-312.pyc
+    - admin.cpython-312 2.pyc
+    - admin.cpython-312.pyc
+    - apps.cpython-312 2.pyc
+    - apps.cpython-312.pyc
+    - models.cpython-312 2.pyc
+    - models.cpython-312.pyc
+  - admin.py
+  - apps.py
+  - management
+    - commands
+      - __init__.py
+      - __pycache__
+        - __init__.cpython-312.pyc
+        - sync_movies.cpython-312.pyc
+      - sync_movies.py
+  - migrations
+    - 0001_initial.py
+    - 0002_movie_trailer_url.py
+    - 0003_movie_tmdb_id.py
+    - 0004_movie_imdb_rating_movie_rotten_tomatoes_rating.py
+    - 0005_remove_movie_imdb_rating_remove_movie_rating.py
+    - __init__.py
+    - __pycache__
+      - 0001_initial.cpython-312 2.pyc
+      - 0001_initial.cpython-312.pyc
+      - 0002_movie_trailer_url.cpython-312 2.pyc
+      - 0002_movie_trailer_url.cpython-312.pyc
+      - 0003_movie_tmdb_id.cpython-312 2.pyc
+      - 0003_movie_tmdb_id.cpython-312.pyc
+      - 0004_movie_imdb_rating_movie_rotten_tomatoes_rating.cpython-312.pyc
+      - 0005_remove_movie_imdb_rating.cpython-312.pyc
+      - 0005_remove_movie_imdb_rating_remove_movie_rating.cpython-312.pyc
+      - __init__.cpython-312 2.pyc
+      - __init__.cpython-312.pyc
+  - models.py
+- utils
+  - __init__
+  - __pycache__
+    - logger_utils.cpython-312.pyc
+    - tmdb_utils.cpython-312.pyc
+    - trailer_utils.cpython-312.pyc
+  - logger_utils.py
+  - tests
+    - __init__.py
+    - __pycache__
+      - __init__.cpython-312.pyc
+      - test_logger_utils.cpython-312.pyc
+    - test_logger_utils.py
+  - trailer_utils.py

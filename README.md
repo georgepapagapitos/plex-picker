@@ -35,4 +35,9 @@ cp .example.env .env
 
 python manage.py sync_movies
 ```
-- python manage.py runserver
+
+```
+# run server, navigate to localhost:8000/picker/random-movie
+
+python manage.py runserver
+```
