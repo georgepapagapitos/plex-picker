@@ -1,1 +1,1 @@
-web: gunicorn plex-picker.wsgi
+web: gunicorn plexpicker.wsgi
