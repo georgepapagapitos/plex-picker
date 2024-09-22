@@ -79,7 +79,3 @@ Contributions are welcome! If you have suggestions or improvements, please fork 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-Feel free to adjust any sections to better fit your project's specific details or preferences!
