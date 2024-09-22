@@ -1,21 +1,30 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Plex Content</title>
-</head>
-<body>
-    <h1>Movies</h1>
-    <ul>
-        {% for movie in movies %}
-            <li>{{ movie.title }} ({{ movie.year }})</li>
-        {% endfor %}
-    </ul>
+{% extends 'base.html' %}
 
-    <h1>TV Shows</h1>
-    <ul>
-        {% for show in shows %}
-            <li>{{ show.title }} ({{ show.year }})</li>
-        {% endfor %}
-    </ul>
-</body>
-</html>
+{% block title %}Plex Content{% endblock %}
+
+{% block content %}
+<div>
+    <h1>Plex Content</h1>
+    <div class="container">
+        <div class="column">
+            <h2>Movies</h2>
+            <ul>
+                {% for movie in movies %}
+                    <li>
+                        <a href="{% url 'movie_detail' movie.id %}">{{ movie.title }}</a> ({{ movie.year }})
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="column">
+            <h2>TV Shows</h2>
+            <ul>
+                {% for show in shows %}
+                    <li>{{ show.title }} ({{ show.year }})</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

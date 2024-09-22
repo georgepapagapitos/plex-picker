@@ -1,11 +1,7 @@
 from django.test import TestCase
 
-from picker.views import (
-    fetch_trailer_url,
-    get_filtered_movies,
-    get_random_movies,
-    get_unique_genres,
-)
+from picker.helpers.random_movie_helpers import fetch_trailer_url
+from picker.views import get_filtered_movies, get_random_movies, get_unique_genres
 from sync.models.movie import Movie
 
 

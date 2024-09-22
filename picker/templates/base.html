@@ -14,11 +14,10 @@
         <h1>Movie Picker</h1>
         <!-- Optional Navigation -->
         {% block nav %}
-        {% comment %} <!-- Uncomment if you have navigation links -->
-        <!-- <nav>
-            <a href="{% url 'home' %}">Home</a>
-            <a href="{% url 'about' %}">About</a>
-        </nav> --> {% endcomment %}
+        <nav>
+            <a href="{% url 'fetch_plex_content' %}">Plex Content</a>
+            <a href="{% url 'fetch_random_movie' %}">Random Movie</a>
+        </nav>
         {% endblock %}
     </header>
 
