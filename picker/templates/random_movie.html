@@ -33,7 +33,7 @@
                         <p>{{ movie.summary }}</p>
                         {% if movie.rotten_tomatoes_rating %}
                     </div>
-                    <p class="rotten-tomato-rating"><strong>Rotten Tomatoes:</strong> {{ movie.rotten_tomatoes_rating }}% 
+                    <p class="rotten-tomato-rating"><strong>Rotten Tomatoes:</strong> {{ movie.rotten_tomatoes_rating|floatformat:0 }}% 
                         {% if movie.rotten_tomatoes_rating >= 85 %}
                             🔥 <!-- Excellent Rating -->
                         {% elif movie.rotten_tomatoes_rating >= 70 %}
