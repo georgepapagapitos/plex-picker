@@ -1,7 +1,3 @@
-Here’s an improved version of your README for the Plex Picker project. It adds clarity, structure, and some additional information to help users understand and get started with the project more easily.
-
----
-
 # Plex Picker
 
 Plex Picker is a Django-based web application that helps users randomly select movies from their Plex library.
