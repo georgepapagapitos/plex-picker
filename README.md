@@ -58,7 +58,7 @@ Plex Picker is a Django-based web application that helps users randomly select m
    ```
 
 7. **Run the Development Server**  
-   Start the server and navigate to [localhost:8000/picker/random-movie](http://localhost:8000/picker/random-movie) in your browser.
+   Start the server and navigate to [localhost:8000/random-movie](http://localhost:8000/random-movie) in your browser.
    ```bash
    python manage.py runserver
    ```
@@ -66,7 +66,7 @@ Plex Picker is a Django-based web application that helps users randomly select m
 ## Usage
 
 Once the server is running, you can access the app via your browser. Explore the functionality by navigating to:
-- [Random Movie Picker](http://localhost:8000/picker/random-movie)
+- [Random Movie Picker](http://localhost:8000/random-movie)
 
 ## Configuration
 
