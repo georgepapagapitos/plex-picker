@@ -1,4 +1,5 @@
-# fetch_plex_content_view.py
+# picker/views/fetch_plex_content_view.py
+
 from typing import Any, Dict
 
 from django.http import HttpRequest, HttpResponse

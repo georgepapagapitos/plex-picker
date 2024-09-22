@@ -1,4 +1,4 @@
-# fetch_random_movie_view.py
+# picker/views/fetch_random_movie_view.py
 
 from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import render

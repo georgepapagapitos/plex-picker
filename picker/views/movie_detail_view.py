@@ -1,4 +1,4 @@
-# sync/views/movie_details_view.py
+# picker/views/movie_details_view.py
 
 import logging
 from typing import Any, Dict

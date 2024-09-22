@@ -1,4 +1,5 @@
-# trailer_utils.py
+# utils/trailer_utils.py
+
 import googleapiclient.discovery
 import requests
 from django.conf import settings

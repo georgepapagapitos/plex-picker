@@ -14,6 +14,8 @@ logger = setup_logging(__name__)
 
 
 class Command(BaseCommand):
+    # python manage.py sync_shows
+
     help = "Sync Plex TV shows and episodes to the local database"
 
     def handle(self, *args, **kwargs):
