@@ -1,5 +1,3 @@
-from unittest.mock import patch
-
 from django.test import TestCase
 
 from picker.views import (
@@ -14,7 +12,6 @@ from sync.models.movie import Movie
 class MovieUtilsTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        # Create test data for the Movie model
         cls.movie1 = Movie.objects.create(
             title="Movie 1", genres="Action, Comedy", tmdb_id=1, plex_key="plex_key_1"
         )
@@ -37,7 +34,6 @@ class MovieUtilsTests(TestCase):
         self.assertNotIn(self.movie3, movies)
 
     def test_get_random_movies(self):
-        # Assuming get_random_movies should return a list of movies
         movies = get_random_movies(Movie.objects.all(), 2)
         self.assertEqual(len(movies), 2)
         self.assertTrue(set(movies).issubset({self.movie1, self.movie2, self.movie3}))

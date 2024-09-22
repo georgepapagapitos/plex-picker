@@ -1,0 +1,1 @@
+web: gunicorn plex-picker.wsgi
