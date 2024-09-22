@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ movie.title }}{% endblock %}
+
+{% block content %}
+<div class="movie-detail">
+    <h1>{{ movie.title }} ({{ movie.year }})</h1>
+    <img src="{{ movie.poster_url }}" alt="{{ movie.title }} poster" />
+    <p><strong>Summary:</strong> {{ movie.summary }}</p>
+    <p><strong>Duration:</strong> {{ movie.duration }} minutes</p>
+    <p><strong>Genres:</strong> {{ movie.genres }}</p>
+    <p><strong>Trailer:</strong> <a href="{{ movie.trailer_url }}">Watch here</a></p>
+    <p><strong>Rotten Tomatoes Rating:</strong> {{ movie.rotten_tomatoes_rating }}</p>
+    <a href="{% url 'fetch_plex_content' %}" class="btn">Back to Movie List</a>
+</div>
+{% endblock %}

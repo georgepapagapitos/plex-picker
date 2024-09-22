@@ -4,7 +4,8 @@ from typing import Any, Dict
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 
-from sync.models import Movie  # Import your Movie model
+from sync.models import Movie
+from sync.models.show import Show
 from utils.logger_utils import setup_logging
 
 logger = setup_logging(__name__)
@@ -23,8 +24,8 @@ def fetch_plex_content(request: HttpRequest) -> HttpResponse:
 
     try:
         # Fetch all movies and TV shows from the local database
-        movies = Movie.objects.all()  # Adjust as necessary to filter or sort movies
-        shows = []  # Assuming you have a similar model for TV shows; adjust as needed
+        movies = Movie.objects.all()
+        shows = Show.objects.all()
 
         # Create context dictionary to pass data to the template
         context: Dict[str, Any] = {"movies": movies, "shows": shows}

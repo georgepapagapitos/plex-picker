@@ -7,30 +7,7 @@
         <h1>Oops! Something went wrong.</h1>
         <p>Error Code: {{ error_code }}</p>
         <p>{{ error_message }}</p>
-        
         <p>Please try again or contact support if the problem persists.</p>
+        <a href="{% url 'fetch_plex_content' %}" class="btn">Back to Movie List</a>
     </div>
-
-    <style>
-        .error-container {
-            max-width: 600px;
-            margin: auto;
-            padding: 20px;
-            background: #f8d7da;
-            border: 1px solid #f5c6cb;
-            border-radius: 5px;
-            color: #721c24;
-        }
-        .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            background: #007bff;
-            color: #ffffff;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-        .btn:hover {
-            background: #0056b3;
-        }
-    </style>
 {% endblock %}

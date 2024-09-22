@@ -1,54 +1,23 @@
 # fetch_random_movie_view.py
-from typing import List
 
-from django.db.models import Q, QuerySet
 from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
+from picker.forms.random_movie_form import RandomMovieForm
+from picker.helpers.random_movie_helpers import (
+    get_filtered_movies,
+    get_random_movies,
+    get_unique_genres,
+)
 from sync.models import Movie
 from utils.logger_utils import setup_logging
-from utils.trailer_utils import get_tmdb_trailer_url, get_youtube_trailer_url
 
 logger = setup_logging(__name__)
 
 
-def get_unique_genres() -> List[str]:
-    # Retrieve distinct genres from the Movie model and return a sorted list
-    genres = Movie.objects.values_list("genres", flat=True).distinct()
-    unique_genres = sorted(
-        set(genre.strip() for genre in ",".join(genres).split(",") if genre.strip())
-    )
-    logger.debug(f"Unique genres: {unique_genres}")
-    return unique_genres
-
-
-def get_filtered_movies(genre: str) -> Q:
-    # Construct a query to filter movies by genre, or return an empty query if no genre is specified
-    query = Q(genres__icontains=genre) if genre else Q()
-    logger.debug(f"Filter query: {query}")
-    return query
-
-
-def get_random_movies(queryset: QuerySet, count: int) -> List[Movie]:
-    # Select a random subset of movies from the given queryset
-    movies = list(queryset.order_by("?")[:count])
-    logger.debug(f"Random movies selected: {[m.title for m in movies]}")
-    return movies
-
-
-def fetch_trailer_url(movie: Movie) -> str:
-    # Fetch and save the trailer URL for a movie if it doesn't already exist
-    if not movie.trailer_url:
-        movie.trailer_url = get_tmdb_trailer_url(
-            movie.tmdb_id
-        ) or get_youtube_trailer_url(movie.title)
-        movie.save(update_fields=["trailer_url"])
-    logger.debug(f"Trailer URL for {movie.title}: {movie.trailer_url}")
-    return movie.trailer_url
-
-
 def fetch_random_movie(request: HttpRequest):
+    form = RandomMovieForm(request.GET or None)
     try:
         # Extract query parameters from the request
         selected_genre = request.GET.get("genre", "")
@@ -89,10 +58,6 @@ def fetch_random_movie(request: HttpRequest):
             logger.debug(
                 f"Movies retrieved from IDs: {[m.title for m in selected_movies]}"
             )
-
-        # Fetch and save trailer URLs for the selected movies
-        for movie in selected_movies:
-            fetch_trailer_url(movie)
 
         # Prepare the context for rendering the template
         context = {
