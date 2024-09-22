@@ -4,7 +4,7 @@ from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from picker.forms.random_movie_form import RandomMovieForm
+from picker.forms import RandomMovieForm
 from picker.helpers.random_movie_helpers import (
     get_filtered_movies,
     get_random_movies,
@@ -17,20 +17,31 @@ logger = setup_logging(__name__)
 
 
 def fetch_random_movie(request: HttpRequest):
-    form = RandomMovieForm(request.GET or None)
     try:
-        # Extract query parameters from the request
-        selected_genre = request.GET.get("genre", "")
-        count = int(request.GET.get("count", 1))
+        # Retrieve the list of unique genres
+        genres = get_unique_genres()
+        genres = get_unique_genres()
+        logger.debug(
+            f"Retrieved genres: {genres}"
+        )  # Log to check if genres are being retrieved correctly
+
+        # Initialize the form with GET data and available genres
+        form = RandomMovieForm(request.GET or None, genres=genres)
+        logger.debug(f"Form initialized with genres: {genres}")
+        logger.debug(
+            f"Form genre choices after initialization: {form.fields['genre'].choices}"
+        )
+        logger.debug(f"Request method: {request.method}")
+        logger.debug(f"GET parameters: {request.GET}")
+
+        selected_genre = form.data.get("genre", "")
+        count = int(form.data.get("count", 1))
         randomize = request.GET.get("randomize", "").lower() == "true"
         movie_ids = request.GET.get("movies", "")
 
         logger.debug(
             f"Input parameters: genre={selected_genre}, count={count}, randomize={randomize}, movie_ids={movie_ids}"
         )
-
-        # Retrieve the list of unique genres
-        genres = get_unique_genres()
 
         if randomize or not movie_ids:
             # If randomizing or no movie IDs provided, filter and select movies
@@ -61,8 +72,8 @@ def fetch_random_movie(request: HttpRequest):
 
         # Prepare the context for rendering the template
         context = {
+            "form": form,
             "movies": selected_movies,
-            "genres": genres,
             "selected_genre": selected_genre,
             "count": count,
             "movie_ids": movie_ids,
