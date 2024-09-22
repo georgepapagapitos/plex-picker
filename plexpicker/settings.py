@@ -33,7 +33,7 @@ SECRET_KEY = "django-insecure-tv*m#n33&o_u7_36@bos!_axw_d_g$87sm$#yfz2mmnq9xsy9m
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["https://plex-picker-95b3fc66e2ad.herokuapp.com"]
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
