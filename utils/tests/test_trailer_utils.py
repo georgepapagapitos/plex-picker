@@ -1,98 +1,79 @@
-# test_trailer_utils.py
-import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import requests
-from django.conf import settings
+from django.test import TestCase
 
-from utils.trailer_utils import get_tmdb_trailer_url, get_youtube_trailer_url
+from sync.models.movie import Movie
+from utils.trailer_utils import fetch_trailer_url, get_tmdb_trailer_url
 
 
-class TestTrailerUtils(unittest.TestCase):
+class TestTrailerUtils(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.movie1 = Movie.objects.create(
+            title="Movie 1", genres="Action, Comedy", tmdb_id=1, plex_key="plex_key_1"
+        )
+        cls.movie2 = Movie.objects.create(
+            title="Movie 2", genres="Action", tmdb_id=2, plex_key="plex_key_2"
+        )
+
+    def test_fetch_trailer_url_existing(self):
+        self.movie1.trailer_url = "http://existing_trailer.com"
+        self.movie1.save()
+
+        trailer_url = fetch_trailer_url(self.movie1)
+        self.assertEqual(trailer_url, "http://existing_trailer.com")
+        self.assertEqual(self.movie1.trailer_url, "http://existing_trailer.com")
+
+    def test_fetch_trailer_url_new(self):
+        self.movie2.trailer_url = None
+        self.movie2.tmdb_id = 123
+        self.movie2.save()
+
+        with patch("utils.trailer_utils.get_tmdb_trailer_url") as mock_tmdb:
+            mock_tmdb.return_value = "https://tmdb_trailer.com"
+            trailer_url = fetch_trailer_url(self.movie2)
+
+        self.assertEqual(trailer_url, "https://tmdb_trailer.com")
+        self.assertEqual(self.movie2.trailer_url, "https://tmdb_trailer.com")
 
     @patch("utils.trailer_utils.requests.get")
     def test_get_tmdb_trailer_url_success(self, mock_get):
-        # Mock the response from TMDB
-        mock_response = MagicMock()
-        mock_response.json.return_value = {
-            "results": [{"type": "Trailer", "key": "trailer_key"}]
+        # Arrange
+        mock_response = {
+            "results": [
+                {"type": "Trailer", "key": "video_id"},
+            ]
         }
-        mock_response.raise_for_status = MagicMock()  # No exception raised
-        mock_get.return_value = mock_response
+        mock_get.return_value.json.return_value = mock_response
+        mock_get.return_value.status_code = 200
 
-        result = get_tmdb_trailer_url(123)
-        self.assertEqual(result, "https://www.youtube.com/embed/trailer_key")
-        mock_get.assert_called_once()
+        # Act
+        trailer_url = get_tmdb_trailer_url(123)
+
+        # Assert
+        self.assertEqual(trailer_url, "https://www.youtube.com/embed/video_id")
 
     @patch("utils.trailer_utils.requests.get")
     def test_get_tmdb_trailer_url_no_trailer(self, mock_get):
-        # Mock the response with no trailers
-        mock_response = MagicMock()
-        mock_response.json.return_value = {"results": []}
-        mock_response.raise_for_status = MagicMock()  # No exception raised
-        mock_get.return_value = mock_response
+        # Arrange
+        mock_response = {"results": []}
+        mock_get.return_value.json.return_value = mock_response
+        mock_get.return_value.status_code = 200
 
-        result = get_tmdb_trailer_url(123)
-        self.assertIsNone(result)
-        mock_get.assert_called_once()
+        # Act
+        trailer_url = get_tmdb_trailer_url(123)
+
+        # Assert
+        self.assertIsNone(trailer_url)
 
     @patch("utils.trailer_utils.requests.get")
-    def test_get_tmdb_trailer_url_request_exception(self, mock_get):
-        # Mock a request exception
+    def test_get_tmdb_trailer_url_failure(self, mock_get):
+        # Arrange
         mock_get.side_effect = requests.RequestException("Network error")
 
-        result = get_tmdb_trailer_url(123)
-        self.assertIsNone(result)
-        mock_get.assert_called_once()
+        # Act
+        trailer_url = get_tmdb_trailer_url(123)
 
-    @patch("googleapiclient.discovery.build")
-    def test_get_youtube_trailer_url_success(self, mock_build):
-        # Mock the YouTube API client
-        mock_youtube = MagicMock()
-
-        # Create a mock request that has an `execute` method
-        mock_request = MagicMock()
-        mock_request.execute.return_value = {
-            "items": [
-                {"id": {"videoId": "video_id"}, "snippet": {"title": "Movie Trailer"}}
-            ]
-        }
-
-        # Set up the mock chain: mock_youtube.search().list() returns mock_request
-        mock_youtube.search.return_value.list.return_value = mock_request
-
-        # Configure the build mock to return our mock_youtube
-        mock_build.return_value = mock_youtube
-
-        result = get_youtube_trailer_url("Movie Title")
-
-        # Debugging output
-        print(f"Result: {result}")
-        print(f"Called with: {mock_build.call_args}")
-
-        self.assertEqual(result, "https://www.youtube.com/watch?v=video_id")
-        mock_build.assert_called_once_with(
-            "youtube", "v3", developerKey=settings.YOUTUBE_API_KEY
-        )
-
-    @patch("googleapiclient.discovery.build")
-    def test_get_youtube_trailer_url_no_trailer(self, mock_build):
-        # Mock the response with no trailers
-        mock_youtube = MagicMock()
-        mock_request = MagicMock()
-        mock_request.execute.return_value = {"items": []}
-        mock_youtube.search.return_value = mock_request
-        mock_build.return_value = mock_youtube
-
-        result = get_youtube_trailer_url("Movie Title")
-        self.assertIsNone(result)
-        mock_build.assert_called_once()
-
-    @patch("googleapiclient.discovery.build")
-    def test_get_youtube_trailer_url_exception(self, mock_build):
-        # Mock an exception during YouTube API call
-        mock_build.side_effect = Exception("API error")
-
-        result = get_youtube_trailer_url("Movie Title")
-        self.assertIsNone(result)
-        mock_build.assert_called_once()
+        # Assert
+        self.assertIsNone(trailer_url)

@@ -1,1 +1,2 @@
-from .random_movie_helpers import *
+from .genre_helpers import *
+from .movie_helpers import *

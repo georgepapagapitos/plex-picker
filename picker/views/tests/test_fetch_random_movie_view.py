@@ -1,6 +1,5 @@
 from django.test import TestCase
 
-from picker.helpers.random_movie_helpers import fetch_trailer_url
 from picker.views import get_filtered_movies, get_random_movies, get_unique_genres
 from sync.models.movie import Movie
 
@@ -33,11 +32,3 @@ class MovieUtilsTests(TestCase):
         movies = get_random_movies(Movie.objects.all(), 2)
         self.assertEqual(len(movies), 2)
         self.assertTrue(set(movies).issubset({self.movie1, self.movie2, self.movie3}))
-
-    def test_fetch_trailer_url_existing(self):
-        self.movie1.trailer_url = "http://existing_trailer.com"
-        self.movie1.save()
-
-        trailer_url = fetch_trailer_url(self.movie1)
-        self.assertEqual(trailer_url, "http://existing_trailer.com")
-        self.assertEqual(self.movie1.trailer_url, "http://existing_trailer.com")
