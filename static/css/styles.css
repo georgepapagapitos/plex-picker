@@ -17,12 +17,14 @@ body {
 
 /* Header Styling */
 header {
+    display: flex;
+    justify-content: space-between;;
     background-color: #007BFF;
     color: white;
     padding: 20px;
     width: 100%;
-    text-align: center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
 }
 
 header h1 {
@@ -30,9 +32,8 @@ header h1 {
     font-size: 2rem;
 }
 
-/* Navigation */
 nav {
-    margin-top: 10px;
+    align-self: center;
 }
 
 nav a {
@@ -78,6 +79,10 @@ form {
     align-items: center;
     justify-content: center;
     margin-bottom: 15px;
+}
+
+h1 {
+    margin-bottom: 0.5rem;
 }
 
 label {
@@ -289,7 +294,10 @@ img {
 }
 
 /* New styles for movie details */
-.movie-detail {
+.media-detail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     max-width: 800px;
     margin: 20px auto;
     padding: 20px;
@@ -298,10 +306,18 @@ img {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.movie-detail img {
+.media-detail img {
     width: 100%;
     border-radius: 10px;
     margin-bottom: 20px;
+}
+
+.media-info {
+    margin-top: 1rem;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
 }
 
 /* Error Page Styles */
@@ -324,6 +340,8 @@ img {
     text-decoration: none;
     border-radius: 5px;
     margin-top: 15px; /* Space above the button */
+    width: 100%;
+    text-align: center;
 }
 
 .btn:hover {
@@ -380,4 +398,10 @@ li a:hover {
         width: 100%; /* Stack columns on smaller screens */
         margin: 0; /* Remove margin for full width */
     }
+}
+
+.episode {
+    text-align: left;
+    margin-right: auto;
+    margin-bottom: 1rem;
 }

@@ -12,7 +12,7 @@ logger = setup_logging(__name__)
 
 def get_filtered_movies(genre: str) -> Q:
     logger.debug(f"Creating filter query for genre: {genre}")
-    query = Q(genres__icontains=genre) if genre else Q()
+    query = Q(genres__name=genre) if genre else Q()
     logger.debug(f"Filter query created: {query}")
     return query
 

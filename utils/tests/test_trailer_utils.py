@@ -3,6 +3,7 @@ from unittest.mock import patch
 import requests
 from django.test import TestCase
 
+from sync.models.genre import Genre
 from sync.models.movie import Movie
 from utils.trailer_utils import fetch_trailer_url, get_tmdb_trailer_url
 
@@ -10,12 +11,23 @@ from utils.trailer_utils import fetch_trailer_url, get_tmdb_trailer_url
 class TestTrailerUtils(TestCase):
     @classmethod
     def setUpTestData(cls):
+        # Create Genre instances
+        action = Genre.objects.create(name="Action")
+        comedy = Genre.objects.create(name="Comedy")
+
         cls.movie1 = Movie.objects.create(
-            title="Movie 1", genres="Action, Comedy", tmdb_id=1, plex_key="plex_key_1"
+            title="Movie 1",
+            tmdb_id=1,
+            plex_key="action_1",
         )
         cls.movie2 = Movie.objects.create(
-            title="Movie 2", genres="Action", tmdb_id=2, plex_key="plex_key_2"
+            title="Movie 2",
+            tmdb_id=2,
+            plex_key="comedy_1",
         )
+
+        Movie.objects.filter(title="Movie 1").first().genres.add(action)
+        Movie.objects.filter(title="Movie 2").first().genres.add(comedy)
 
     def test_fetch_trailer_url_existing(self):
         self.movie1.trailer_url = "http://existing_trailer.com"

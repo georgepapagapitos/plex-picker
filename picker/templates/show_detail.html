@@ -3,19 +3,34 @@
 {% block title %}{{ show.title }}{% endblock %}
 
 {% block content %}
-<div class="show-detail">
-    <h1>{{ show.title }} ({{ show.year }})</h1>
+<div class="media-detail">
+    <h1>{{ show.title }}</h1>
     <img src="{{ show.poster_url }}" alt="{{ show.title }} poster" />
-    <p><strong>Summary:</strong> {{ show.summary }}</p>
-    <p><strong>Genres:</strong> {{ show.genres }}</p>
-    <p><strong>Duration:</strong> {{ show.duration }} minutes</p>
-    <p><strong>Rotten Tomatoes Rating:</strong> {{ show.rotten_tomatoes_rating }}</p>
+    <p>{{ show.summary }}</p>
+    <div class="media-info">
+        <p><strong>Genres:</strong> {{ show.formatted_genres }}</p>
+        <p><strong>Rotten Tomatoes:</strong> {{ show.rotten_tomatoes_rating|floatformat:0 }}% 
+            {% if show.rotten_tomatoes_rating >= 85 %}
+                🔥 <!-- Excellent Rating -->
+            {% elif show.rotten_tomatoes_rating >= 70 %}
+                😊 <!-- Very Good Rating -->
+            {% elif show.rotten_tomatoes_rating >= 60 %}
+                👍 <!-- Good Rating -->
+            {% elif show.rotten_tomatoes_rating >= 50 %}
+                😐 <!-- Average Rating -->
+            {% elif show.rotten_tomatoes_rating >= 40 %}
+                👎 <!-- Below Average Rating -->
+            {% else %}
+                💩 <!-- Poor Rating -->
+            {% endif %}
+        </p>
+    </div>
     
     <h2>Episodes</h2>
     {% for episode in show.episodes.all %}
-        <div>
-            <strong>Season {{ episode.season_number }}, Episode {{ episode.episode_number }}:</strong>
-            <p>{{ episode.title }}</p>
+        <div class="episode">
+            <p style="margin-bottom: 0.25rem;"><strong>Season {{ episode.season_number }}, Episode {{ episode.episode_number }} - </strong>
+            {{ episode.title }} ({{ episode.formatted_duration }})</p>
             <p><em>{{ episode.summary }}</em></p>
         </div>
     {% endfor %}

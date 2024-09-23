@@ -1,6 +1,7 @@
-# picker/forms.py
-
 from django import forms
+
+from sync.models import Movie
+from sync.models.genre import Genre
 
 
 class RandomMovieForm(forms.Form):
@@ -9,7 +10,13 @@ class RandomMovieForm(forms.Form):
     count = forms.ChoiceField(choices=[(i, str(i)) for i in range(1, 5)], initial=1)
 
     def __init__(self, *args, **kwargs):
-        genres = kwargs.pop("genres", [])
         super().__init__(*args, **kwargs)
-        # Extend the choices with unique genres
-        self.fields["genre"].choices += [(genre, genre) for genre in genres]
+        # Fetch distinct genres that have at least one associated movie, ordered alphabetically
+        genres_with_movies = (
+            Genre.objects.filter(movies__isnull=False)
+            .distinct()
+            .order_by("name")
+            .values_list("name", flat=True)
+        )
+        # Extend the choices with unique genres that have movies
+        self.fields["genre"].choices += [(genre, genre) for genre in genres_with_movies]

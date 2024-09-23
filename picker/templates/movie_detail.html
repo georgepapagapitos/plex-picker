@@ -3,14 +3,30 @@
 {% block title %}{{ movie.title }}{% endblock %}
 
 {% block content %}
-<div class="movie-detail">
-    <h1>{{ movie.title }} ({{ movie.year }})</h1>
+<div class="media-detail">
+    <h1>{{ movie.title }}</h1>
     <img src="{{ movie.poster_url }}" alt="{{ movie.title }} poster" />
-    <p><strong>Summary:</strong> {{ movie.summary }}</p>
-    <p><strong>Duration:</strong> {{ movie.duration }} minutes</p>
-    <p><strong>Genres:</strong> {{ movie.genres }}</p>
-    <p><strong>Trailer:</strong> <a href="{{ movie.trailer_url }}">Watch here</a></p>
-    <p><strong>Rotten Tomatoes Rating:</strong> {{ movie.rotten_tomatoes_rating }}</p>
+    <p>{{ movie.summary }}</p>
+    <div class="media-info">
+        <p><strong>Duration:</strong> {{ movie.formatted_duration }}</p>
+        <p><strong>Genres:</strong> {{ movie.formatted_genres }}</p>
+        <p><strong>Trailer:</strong> <a href="{{ movie.trailer_url }}">Watch here</a></p>
+        <p class="rotten-tomato-rating"><strong>Rotten Tomatoes:</strong> {{ movie.rotten_tomatoes_rating|floatformat:0 }}% 
+            {% if movie.rotten_tomatoes_rating >= 85 %}
+                🔥 <!-- Excellent Rating -->
+            {% elif movie.rotten_tomatoes_rating >= 70 %}
+                😊 <!-- Very Good Rating -->
+            {% elif movie.rotten_tomatoes_rating >= 60 %}
+                👍 <!-- Good Rating -->
+            {% elif movie.rotten_tomatoes_rating >= 50 %}
+                😐 <!-- Average Rating -->
+            {% elif movie.rotten_tomatoes_rating >= 40 %}
+                👎 <!-- Below Average Rating -->
+            {% else %}
+                💩 <!-- Poor Rating -->
+            {% endif %}
+        </p>
+    </div>
     <a href="{% url 'fetch_plex_content' %}" class="btn">Back to Movie List</a>
 </div>
 {% endblock %}
