@@ -2,12 +2,7 @@ from unittest.mock import MagicMock, patch
 
 from django.test import TestCase
 
-from picker.helpers.random_movie_helpers import (
-    fetch_trailer_url,
-    get_filtered_movies,
-    get_random_movies,
-    get_unique_genres,
-)
+from picker.helpers.movie_helpers import get_filtered_movies, get_random_movies
 from sync.models import Movie
 
 
@@ -29,10 +24,6 @@ class TestRandomMovieHelpers(TestCase):
         cls.movie5 = Movie.objects.create(
             title="Movie 5", genres="Horror", tmdb_id=5, plex_key="plex_key_5"
         )
-
-    def test_get_unique_genres(self):
-        genres = get_unique_genres()
-        self.assertEqual(genres, ["Action", "Comedy", "Drama", "Horror"])
 
     def test_get_filtered_movies(self):
         query = get_filtered_movies("Action")
@@ -65,25 +56,3 @@ class TestRandomMovieHelpers(TestCase):
         self.assertTrue(
             set(movies).issubset({self.movie1, self.movie2, self.movie3, self.movie5})
         )
-
-    def test_fetch_trailer_url_existing(self):
-        self.movie1.trailer_url = "http://existing_trailer.com"
-        self.movie1.save()
-
-        trailer_url = fetch_trailer_url(self.movie1)
-        self.assertEqual(trailer_url, "http://existing_trailer.com")
-        self.assertEqual(self.movie1.trailer_url, "http://existing_trailer.com")
-
-    def test_fetch_trailer_url_new(self):
-        self.movie2.trailer_url = None
-        self.movie2.tmdb_id = 123
-        self.movie2.save()
-
-        with patch(
-            "picker.helpers.random_movie_helpers.get_tmdb_trailer_url"
-        ) as mock_tmdb:
-            mock_tmdb.return_value = "https://tmdb_trailer.com"
-            trailer_url = fetch_trailer_url(self.movie2)
-
-        self.assertEqual(trailer_url, "https://tmdb_trailer.com")
-        self.assertEqual(self.movie2.trailer_url, "https://tmdb_trailer.com")

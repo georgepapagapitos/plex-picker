@@ -4,9 +4,9 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from plexapi.server import PlexServer
 
-from picker.helpers.random_movie_helpers import fetch_trailer_url  # Import the function
 from sync.models.movie import Movie
 from utils.logger_utils import setup_logging
+from utils.trailer_utils import fetch_trailer_url
 
 logger = setup_logging(__name__)
 

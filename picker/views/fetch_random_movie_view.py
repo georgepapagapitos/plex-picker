@@ -5,11 +5,8 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from picker.forms import RandomMovieForm
-from picker.helpers.random_movie_helpers import (
-    get_filtered_movies,
-    get_random_movies,
-    get_unique_genres,
-)
+from picker.helpers.genre_helpers import get_unique_genres
+from picker.helpers.movie_helpers import get_filtered_movies, get_random_movies
 from sync.models import Movie
 from utils.logger_utils import setup_logging
 
@@ -19,7 +16,6 @@ logger = setup_logging(__name__)
 def fetch_random_movie(request: HttpRequest):
     try:
         # Retrieve the list of unique genres
-        genres = get_unique_genres()
         genres = get_unique_genres()
         logger.debug(
             f"Retrieved genres: {genres}"

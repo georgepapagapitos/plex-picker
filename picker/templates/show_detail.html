@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ show.title }}{% endblock %}
+
+{% block content %}
+<div class="show-detail">
+    <h1>{{ show.title }} ({{ show.year }})</h1>
+    <img src="{{ show.poster_url }}" alt="{{ show.title }} poster" />
+    <p><strong>Summary:</strong> {{ show.summary }}</p>
+    <p><strong>Genres:</strong> {{ show.genres }}</p>
+    <p><strong>Duration:</strong> {{ show.duration }} minutes</p>
+    <p><strong>Rotten Tomatoes Rating:</strong> {{ show.rotten_tomatoes_rating }}</p>
+    
+    <h2>Episodes</h2>
+    {% for episode in show.episodes.all %}
+        <div>
+            <strong>Season {{ episode.season_number }}, Episode {{ episode.episode_number }}:</strong>
+            <p>{{ episode.title }}</p>
+            <p><em>{{ episode.summary }}</em></p>
+        </div>
+    {% endfor %}
+    
+    <a href="{% url 'fetch_plex_content' %}" class="btn">Back to TV Show List</a>
+</div>
+{% endblock %}

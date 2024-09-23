@@ -7,9 +7,9 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, render
 
 from sync.models.movie import Movie
+from utils.logger_utils import setup_logging
 
-# Set up logging
-logger = logging.getLogger(__name__)
+logger = setup_logging(__name__)
 
 
 def movie_detail_view(request: HttpRequest, movie_id: int) -> HttpResponse:
