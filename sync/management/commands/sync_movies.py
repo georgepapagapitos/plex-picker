@@ -5,6 +5,7 @@ from django.core.management.base import BaseCommand
 from plexapi.server import PlexServer
 
 from sync.models.movie import Movie
+from utils.genre_utils import get_or_create_genres
 from utils.logger_utils import setup_logging
 from utils.trailer_utils import fetch_trailer_url
 
@@ -58,11 +59,16 @@ class Command(BaseCommand):
                             "year": year,
                             "duration": duration,
                             "poster_url": poster_url,
-                            "genres": genres,
                             "tmdb_id": tmdb_id,
                             "rotten_tomatoes_rating": rotten_tomatoes_rating,
                         },
                     )
+
+                    # Get or create genre objects
+                    genre_objects = get_or_create_genres(genres)
+
+                    # Set the genres for the movie
+                    movie.genres.set(genre_objects)
 
                     if created:
                         logger.info(f"Added new movie: {title}")
@@ -70,9 +76,7 @@ class Command(BaseCommand):
                     else:
                         logger.info(f"Updated existing movie: {title}")
                         # Update the trailer URL if it's not set
-                        if (
-                            not movie.trailer_url
-                        ):  # Adjust this based on your model's field name
+                        if not movie.trailer_url:
                             fetch_trailer_url(movie)
 
                 except Exception as db_error:

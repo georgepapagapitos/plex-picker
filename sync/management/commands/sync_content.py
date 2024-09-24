@@ -1,3 +1,5 @@
+# sync/management/commands/sync_content.py
+
 import concurrent.futures
 
 from django.core.management.base import BaseCommand
