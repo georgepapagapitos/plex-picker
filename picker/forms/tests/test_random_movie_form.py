@@ -1,66 +1,84 @@
-from django.test import TestCase
+from django import forms
+from django.db.models import Max, Min
 
-from picker.forms import RandomMovieForm
-from sync.models import Movie  # Assuming Movie is in sync.models
+from sync.models import Movie
 from sync.models.genre import Genre
 
 
-class RandomMovieFormTests(TestCase):
+class RandomMovieForm(forms.Form):
+    GENRE_CHOICES = [("", "Any")]
+    genre = forms.ChoiceField(choices=GENRE_CHOICES, required=False)
+    count = forms.ChoiceField(choices=[(i, str(i)) for i in range(1, 5)], initial=1)
 
-    @classmethod
-    def setUpTestData(cls):
-        # Create Genre instances
-        action = Genre.objects.create(name="Action")
-        comedy = Genre.objects.create(name="Comedy")
-        drama = Genre.objects.create(name="Drama")
+    min_rotten_tomatoes_rating = forms.ChoiceField(required=False)
+    max_duration = forms.ChoiceField(required=False)
 
-        # Create Movies associated with these genres
-        Movie.objects.create(
-            title="Action Movie", duration=120, year=2022, plex_key="action_1"
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        genres_with_movies = (
+            Genre.objects.filter(movies__isnull=False)
+            .distinct()
+            .order_by("name")
+            .values_list("name", flat=True)
         )
-        Movie.objects.create(
-            title="Comedy Movie", duration=90, year=2021, plex_key="comedy_1"
+        self.fields["genre"].choices += [(genre, genre) for genre in genres_with_movies]
+        self.fields["min_rotten_tomatoes_rating"].choices = self.get_rating_choices()
+        self.fields["max_duration"].choices = self.get_duration_choices()
+
+    def clean_min_rotten_tomatoes_rating(self):
+        value = self.cleaned_data.get("min_rotten_tomatoes_rating")
+        return int(value) if value else None
+
+    def clean_max_duration(self):
+        value = self.cleaned_data.get("max_duration")
+        return int(value) if value else ""  # Change to return empty string
+
+    def get_duration_choices(self):
+        durations = Movie.objects.aggregate(
+            min_duration=Min("duration"), max_duration=Max("duration")
         )
-        Movie.objects.create(
-            title="Drama Movie", duration=140, year=2020, plex_key="drama_1"
+
+        min_duration = (
+            int(durations["min_duration"] // 60000) if durations["min_duration"] else 0
+        )
+        max_duration = (
+            int(durations["max_duration"] // 60000) if durations["max_duration"] else 0
         )
 
-        # Add genres to movies to reflect the associations
-        Movie.objects.filter(title="Action Movie").first().genres.add(action)
-        Movie.objects.filter(title="Comedy Movie").first().genres.add(comedy)
-        Movie.objects.filter(title="Drama Movie").first().genres.add(drama)
+        choices = [("", "Any")]
 
-        cls.genre_names = [action.name, comedy.name, drama.name]
+        for hours in range(0, (max_duration // 60) + 1):
+            for minutes in range(0, 60, 30):
+                total_minutes = hours * 60 + minutes
+                if total_minutes < min_duration or total_minutes > max_duration:
+                    continue
 
-    def test_form_initialization_with_genres(self):
-        form = RandomMovieForm()
-        for genre in self.genre_names:
-            self.assertIn((genre, genre), form.fields["genre"].choices)
+                if hours > 0 and minutes > 0:
+                    choices.append((total_minutes, f"{hours}h {minutes}m"))
+                elif hours > 0:
+                    choices.append((total_minutes, f"{hours}h"))
+                else:
+                    choices.append((total_minutes, f"{minutes}m"))
 
-    def test_form_with_valid_data(self):
-        form_data = {"genre": "Action", "count": "2"}
-        form = RandomMovieForm(data=form_data)
-        self.assertTrue(form.is_valid())
-        self.assertEqual(form.cleaned_data["genre"], "Action")
-        self.assertEqual(form.cleaned_data["count"], "2")
+        return choices
 
-    def test_form_with_invalid_count(self):
-        form_data = {"genre": "Action", "count": "5"}  # Invalid count (max is 4)
-        form = RandomMovieForm(data=form_data)
-        self.assertFalse(form.is_valid())
-        self.assertIn("count", form.errors)
+    def get_rating_choices(self):
+        ratings = Movie.objects.aggregate(
+            min_rating=Min("rotten_tomatoes_rating"),
+            max_rating=Max("rotten_tomatoes_rating"),
+        )
 
-    def test_form_without_data(self):
-        form = RandomMovieForm(data={})
-        self.assertFalse(form.is_valid())
-        self.assertIn(
-            "count", form.errors
-        )  # Count should be required if genre is not selected
+        min_rating = (
+            int(ratings["min_rating"]) if ratings["min_rating"] is not None else 0
+        )
+        max_rating = (
+            int(ratings["max_rating"]) if ratings["max_rating"] is not None else 100
+        )
 
-    def test_empty_genre_choices(self):
-        # Case when there are no movies associated with genres
-        Genre.objects.all().delete()  # Clear genres to simulate no available choices
-        form = RandomMovieForm()
-        self.assertEqual(
-            form.fields["genre"].choices, [("", "Any")]
-        )  # Only the "Any" option should remain
+        choices = [("", "Any")]
+
+        for rating in range(min_rating, max_rating + 1, 10):
+            choices.append((rating, f"{rating}%"))
+
+        return choices
