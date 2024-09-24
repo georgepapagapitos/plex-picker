@@ -6,10 +6,10 @@
     <!-- Genre and count selection form -->
     <form method="GET" action="{% url 'fetch_random_movie' %}">
         <div class="form-group">
-            {{ form.genre.label }} {{ form.genre }}  <!-- Render the genre select field -->
-        </div>
-        <div class="form-group">
-            {{ form.count.label }} {{ form.count }}  <!-- Render the count select field -->
+            {{ form.genre.label }} {{ form.genre }}
+            {{ form.count.label }} {{ form.count }}
+            {{ form.min_rotten_tomatoes_rating.label }} {{ form.min_rotten_tomatoes_rating }}
+            {{ form.max_duration.label }} {{ form.max_duration }}
         </div>
         <input type="hidden" name="randomize" value="true">
         <input type="hidden" name="movies" value="{{ movie_ids }}">
@@ -27,7 +27,9 @@
         <div class="movies-container" id="moviesContainer">
             {% for movie in movies %}
                 <div class="movie-container">
-                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }} Poster" class="movie-poster" />
+                    <a href="{% url 'movie_detail' movie.id %}?genre={{ genre }}&count={{ count }}&movies={{ movie_ids }}&min_rotten_tomatoes_rating={{ min_rating }}&max_duration={{ max_duration }}"> 
+                        <img src="{{ movie.poster_url }}" alt="{{ movie.title }} Poster" />
+                    </a>
                     <div class="movie-details">
                         <h2>{{ movie.title }} ({{ movie.year }})</h2>
                         <p>{{ movie.summary }}</p>

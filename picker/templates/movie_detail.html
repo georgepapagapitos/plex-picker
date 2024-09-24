@@ -27,6 +27,10 @@
             {% endif %}
         </p>
     </div>
+    {% if random_movies %}
+        <a href="{% url 'fetch_random_movie' %}?genre={{ genre }}&count={{ count }}&movies={{ random_movies }}&min_rotten_tomatoes_rating={{ min_rating }}&max_duration={{ max_duration }}" class="btn">Back to Random Movies</a>
+    {% endif %}
+
     <a href="{% url 'fetch_plex_content' %}" class="btn">Back to Movie List</a>
 </div>
 {% endblock %}

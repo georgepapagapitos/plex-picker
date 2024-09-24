@@ -1,4 +1,4 @@
-# picker/views/movie_details_view.py
+# picker/views/movie_detail_view.py
 
 import logging
 from typing import Any, Dict
@@ -16,8 +16,20 @@ def movie_detail_view(request: HttpRequest, movie_id: int) -> HttpResponse:
     try:
         movie: Movie = get_object_or_404(Movie, pk=movie_id)
 
+        # Capture the parameters for redirection
+        random_movies = request.GET.get("movies", "")
+        genre = request.GET.get("genre", "")
+        count = request.GET.get("count", 1)
+        min_rating = request.GET.get("min_rotten_tomatoes_rating", "")
+        max_duration = request.GET.get("max_duration", "")
+
         context: Dict[str, Any] = {
             "movie": movie,
+            "random_movies": random_movies,
+            "genre": genre,
+            "count": count,
+            "min_rating": min_rating,
+            "max_duration": max_duration,
         }
 
         return render(request, "movie_detail.html", context)
