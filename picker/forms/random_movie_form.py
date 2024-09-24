@@ -32,13 +32,20 @@ class RandomMovieForm(forms.Form):
         # Set duration choices including "Any"
         self.fields["max_duration"].choices = self.get_duration_choices()
 
+    def clean_min_rotten_tomatoes_rating(self):
+        value = self.cleaned_data.get("min_rotten_tomatoes_rating")
+        return int(value) if value else None
+
+    def clean_max_duration(self):
+        value = self.cleaned_data.get("max_duration")
+        return int(value) if value else None
+
     def get_duration_choices(self):
         """Generate duration choices in a human-readable format based on existing movies."""
         durations = Movie.objects.aggregate(
             min_duration=Min("duration"), max_duration=Max("duration")
         )
 
-        # Convert milliseconds to minutes and ensure they are integers
         min_duration = (
             int(durations["min_duration"] // 60000) if durations["min_duration"] else 0
         )
