@@ -1,11 +1,13 @@
+# picker/views/tests/test_random_movie_view.py
+
 from django.test import TestCase
 
-from picker.views import get_filtered_movies, get_random_movies
+from picker.helpers.movie_helpers import get_filtered_movies, get_random_movies
 from sync.models.genre import Genre
 from sync.models.movie import Movie
 
 
-class FetchRandomMovieViewTests(TestCase):
+class RandomMovieViewTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         action = Genre.objects.create(name="Action")

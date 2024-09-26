@@ -4,7 +4,7 @@
 
 {% block content %}
     <!-- Genre and count selection form -->
-    <form method="GET" action="{% url 'fetch_random_movie' %}">
+    <form method="GET" action="{% url 'random_movie' %}">
         <div class="form-group">
             {{ form.genre.label }} {{ form.genre }}
             {{ form.count.label }} {{ form.count }}
@@ -27,36 +27,36 @@
         <div class="movies-container" id="moviesContainer">
             {% for movie in movies %}
                 <div class="movie-container">
-                    <a href="{% url 'movie_detail' movie.id %}?genre={{ genre }}&count={{ count }}&movies={{ movie_ids }}&min_rotten_tomatoes_rating={{ min_rating }}&max_duration={{ max_duration }}"> 
+                    <a href="{% url 'movie_detail' movie.id %}?genre={{ genre }}&count={{ count }}&movies={{ movie_ids }}&min_rotten_tomatoes_rating={{ min_rating }}&max_duration={{ max_duration }}">
                         <img src="{{ movie.poster_url }}" alt="{{ movie.title }} Poster" />
                     </a>
                     <div class="movie-details">
                         <h2>{{ movie.title }} ({{ movie.year }})</h2>
                         <p>{{ movie.summary }}</p>
                         {% if movie.rotten_tomatoes_rating %}
-                    </div>
-                    <p class="rotten-tomato-rating"><strong>Rotten Tomatoes:</strong> {{ movie.rotten_tomatoes_rating|floatformat:0 }}% 
-                        {% if movie.rotten_tomatoes_rating >= 85 %}
-                            🔥 <!-- Excellent Rating -->
-                        {% elif movie.rotten_tomatoes_rating >= 70 %}
-                            😊 <!-- Very Good Rating -->
-                        {% elif movie.rotten_tomatoes_rating >= 60 %}
-                            👍 <!-- Good Rating -->
-                        {% elif movie.rotten_tomatoes_rating >= 50 %}
-                            😐 <!-- Average Rating -->
-                        {% elif movie.rotten_tomatoes_rating >= 40 %}
-                            👎 <!-- Below Average Rating -->
-                        {% else %}
-                            💩 <!-- Poor Rating -->
+                            </div>
+                            <p class="rotten-tomato-rating"><strong>Rotten Tomatoes:</strong> {{ movie.rotten_tomatoes_rating|floatformat:0 }}%
+                                {% if movie.rotten_tomatoes_rating >= 85 %}
+                                    🔥 <!-- Excellent Rating -->
+                                {% elif movie.rotten_tomatoes_rating >= 70 %}
+                                    😊 <!-- Very Good Rating -->
+                                {% elif movie.rotten_tomatoes_rating >= 60 %}
+                                    👍 <!-- Good Rating -->
+                                {% elif movie.rotten_tomatoes_rating >= 50 %}
+                                    😐 <!-- Average Rating -->
+                                {% elif movie.rotten_tomatoes_rating >= 40 %}
+                                    👎 <!-- Below Average Rating -->
+                                {% else %}
+                                    💩 <!-- Poor Rating -->
+                                {% endif %}
+                            </p>
                         {% endif %}
-                    </p>
-                    {% endif %}
-                    {% if movie.trailer_url %}
-                        <button class="trailer-button" data-trailer-url="https://www.youtube.com/embed/{{ movie.trailer_url|slice:'-11:' }}">Watch Trailer</button>
-                    {% else %}
-                        <p><strong>Watch Trailer:</strong> Trailer not available</p>
-                    {% endif %}
-                </div>
+                        {% if movie.trailer_url %}
+                            <button class="trailer-button" data-trailer-url="https://www.youtube.com/embed/{{ movie.trailer_url|slice:'-11:' }}">Watch Trailer</button>
+                        {% else %}
+                            <p><strong>Watch Trailer:</strong> Trailer not available</p>
+                        {% endif %}
+                    </div>
             {% endfor %}
         </div>
 

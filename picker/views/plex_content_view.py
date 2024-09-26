@@ -1,4 +1,4 @@
-# picker/views/fetch_plex_content_view.py
+# picker/views/plex_content_view.py
 
 from typing import Any, Dict
 
@@ -12,7 +12,7 @@ from utils.logger_utils import setup_logging
 logger = setup_logging(__name__)
 
 
-def fetch_plex_content(request: HttpRequest) -> HttpResponse:
+def plex_content_view(request: HttpRequest) -> HttpResponse:
     """
     Fetches content from the local database and renders it in a template.
 

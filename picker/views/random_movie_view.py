@@ -1,3 +1,5 @@
+# picker/views/random_movie_view.py
+
 from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -10,7 +12,7 @@ from utils.logger_utils import setup_logging
 logger = setup_logging(__name__)
 
 
-def fetch_random_movie(request: HttpRequest):
+def random_movie_view(request: HttpRequest):
     try:
         # Initialize the form with GET data; genres are fetched in the form itself
         form = RandomMovieForm(request.GET or None)
@@ -44,7 +46,7 @@ def fetch_random_movie(request: HttpRequest):
 
                 # Redirect to the same view with selected movie IDs in the URL
                 return HttpResponseRedirect(
-                    f"{reverse('fetch_random_movie')}?genre={selected_genre}&count={count}&movies={movie_ids}&min_rotten_tomatoes_rating={selected_rating}&max_duration={selected_duration}"
+                    f"{reverse('random_movie')}?genre={selected_genre}&count={count}&movies={movie_ids}&min_rotten_tomatoes_rating={selected_rating}&max_duration={selected_duration}"
                 )
             else:
                 logger.warning("No movies found matching the criteria")

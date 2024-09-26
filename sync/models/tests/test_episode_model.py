@@ -1,8 +1,9 @@
+# sync/models/tests/test_episode_model.py
+
 from django.forms import ValidationError
 from django.test import TestCase
 
-from sync.models.episode import Episode
-from sync.models.show import Show
+from sync.models import Episode, Show
 
 
 class EpisodeModelTests(TestCase):

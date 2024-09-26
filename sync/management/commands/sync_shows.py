@@ -6,6 +6,7 @@ from django.core.management.base import BaseCommand
 from django.db import IntegrityError, transaction
 from plexapi.server import PlexServer
 
+from sync.models.actor import Actor
 from sync.models.episode import Episode
 from sync.models.show import Show
 from utils.genre_utils import get_or_create_genres
@@ -15,7 +16,7 @@ logger = setup_logging(__name__)
 
 
 class Command(BaseCommand):
-    help = "Sync Plex TV shows and episodes to the local database"
+    help = "Sync Plex TV shows, episodes, and actors to the local database"
 
     def handle(self, *args, **kwargs):
         try:
@@ -27,114 +28,26 @@ class Command(BaseCommand):
             existing_episodes = {
                 episode.plex_key: episode for episode in Episode.objects.all()
             }
-
-            shows_to_create, shows_to_update, episodes_to_create, episodes_to_update = (
-                [],
-                [],
-                [],
-                [],
-            )
+            existing_actors = {
+                f"{actor.first_name} {actor.last_name}": actor
+                for actor in Actor.objects.all()
+            }
 
             for plex_show in shows:
-                show_data = self.extract_show_data(plex_show)
-                plex_key = show_data["plex_key"]
-                genres = ", ".join([g.tag for g in plex_show.genres])
+                self.process_show(
+                    plex_show, existing_shows, existing_episodes, existing_actors
+                )
 
-                existing_show = existing_shows.get(plex_key)
-
-                if existing_show:
-                    shows_to_update.append(show_data)
-                    logger.debug(f"Updating existing show: {show_data['title']}")
-                else:
-                    shows_to_create.append(show_data)
-                    logger.info(f"Found new show: {show_data['title']}")
-
-                try:
-                    with transaction.atomic():
-                        if existing_show:
-                            for key, value in show_data.items():
-                                setattr(existing_show, key, value)
-                            existing_show.save()
-                        else:
-                            new_show, created = Show.objects.get_or_create(
-                                plex_key=plex_key, defaults=show_data
-                            )
-                            if created:
-                                logger.info(f"Created new show: {new_show.title}")
-                            else:
-                                logger.warning(f"Show already exists: {new_show.title}")
-
-                    genre_objects = get_or_create_genres(genres)
-                    if existing_show:
-                        existing_show.genres.set(genre_objects)
-                    else:
-                        new_show.genres.set(genre_objects)
-
-                    for plex_episode in plex_show.episodes():
-                        episode_data = self.extract_episode_data(
-                            plex_episode,
-                            new_show.id if not existing_show else existing_show.id,
-                        )
-                        existing_episode = existing_episodes.get(
-                            episode_data["plex_key"]
-                        )
-
-                        if existing_episode:
-                            episode_data["id"] = existing_episode.id
-                            episodes_to_update.append(episode_data)
-                            logger.debug(
-                                f"Updating existing episode: {episode_data['title']}"
-                            )
-                        else:
-                            episodes_to_create.append(episode_data)
-                            logger.info(f"Found new episode: {episode_data['title']}")
-
-                except IntegrityError as e:
-                    logger.error(
-                        f"IntegrityError for show {show_data['title']}: {str(e)}"
-                    )
-                    continue
-
-            with transaction.atomic():
-                if shows_to_update:
-                    Show.objects.bulk_update(
-                        [Show(**data) for data in shows_to_update],
-                        [
-                            "title",
-                            "summary",
-                            "year",
-                            "duration",
-                            "poster_url",
-                            "tmdb_id",
-                            "rotten_tomatoes_rating",
-                        ],
-                    )
-                if episodes_to_create:
-                    Episode.objects.bulk_create(
-                        [Episode(**data) for data in episodes_to_create]
-                    )
-                if episodes_to_update:
-                    Episode.objects.bulk_update(
-                        [Episode(**data) for data in episodes_to_update],
-                        [
-                            "title",
-                            "summary",
-                            "season_number",
-                            "episode_number",
-                            "duration",
-                            "tmdb_id",
-                            "rotten_tomatoes_rating",
-                        ],
-                    )
-
-            logger.info("Show and episode sync completed successfully.")
+            logger.info("Show, episode, and actor sync completed successfully.")
 
         except requests.exceptions.RequestException as e:
             logger.error(f"Network error while syncing: {str(e)}")
         except Exception as e:
             logger.error(f"Unexpected error: {str(e)}")
 
-    def process_show(self, plex_show, existing_shows, existing_episodes):
+    def process_show(
+        self, plex_show, existing_shows, existing_episodes, existing_actors
+    ):
         try:
             show_data = self.extract_show_data(plex_show)
             plex_key = show_data["plex_key"]
@@ -148,15 +61,13 @@ class Command(BaseCommand):
                 else:
                     new_show = self.create_show(show_data)
 
-                genre_objects = get_or_create_genres(genres)
-                if existing_show:
-                    existing_show.genres.set(genre_objects)
-                else:
-                    new_show.genres.set(genre_objects)
+                show = existing_show or new_show
 
-                self.process_episodes(
-                    plex_show, existing_show or new_show, existing_episodes
-                )
+                genre_objects = get_or_create_genres(genres)
+                show.genres.set(genre_objects)
+
+                self.process_actors(plex_show, show, existing_actors)
+                self.process_episodes(plex_show, show, existing_episodes)
 
         except IntegrityError as e:
             logger.error(f"IntegrityError for show {show_data['title']}: {str(e)}")
@@ -168,6 +79,7 @@ class Command(BaseCommand):
             setattr(existing_show, key, value)
         existing_show.save()
         logger.debug(f"Updated existing show: {show_data['title']}")
+        return existing_show
 
     def create_show(self, show_data):
         new_show, created = Show.objects.get_or_create(
@@ -179,6 +91,27 @@ class Command(BaseCommand):
             logger.warning(f"Show already exists: {new_show.title}")
         return new_show
 
+    def process_actors(self, plex_show, db_show, existing_actors):
+        show_actors = []
+        for role in plex_show.roles:
+            first_name, last_name = self.split_name(role.tag)
+            full_name = f"{first_name} {last_name}"
+
+            if full_name in existing_actors:
+                actor = existing_actors[full_name]
+                if actor.photo_url != role.thumb:
+                    actor.photo_url = role.thumb
+                    actor.save()
+            else:
+                actor = Actor.objects.create(
+                    first_name=first_name, last_name=last_name, photo_url=role.thumb
+                )
+                existing_actors[full_name] = actor
+
+            show_actors.append(actor)
+
+        db_show.actors.set(show_actors)
+
     def process_episodes(self, plex_show, db_show, existing_episodes):
         episodes_to_create = []
         episodes_to_update = []
@@ -188,8 +121,9 @@ class Command(BaseCommand):
             existing_episode = existing_episodes.get(episode_data["plex_key"])
 
             if existing_episode:
-                episode_data["id"] = existing_episode.id
-                episodes_to_update.append(Episode(**episode_data))
+                for key, value in episode_data.items():
+                    setattr(existing_episode, key, value)
+                episodes_to_update.append(existing_episode)
                 logger.debug(f"Updating existing episode: {episode_data['title']}")
             else:
                 episodes_to_create.append(Episode(**episode_data))
@@ -211,6 +145,17 @@ class Command(BaseCommand):
                         "rotten_tomatoes_rating",
                     ],
                 )
+
+    @staticmethod
+    def split_name(full_name):
+        name_parts = full_name.split(maxsplit=1)
+        if len(name_parts) == 2:
+            return name_parts[0], name_parts[1]
+        else:
+            return (
+                name_parts[0],
+                "",
+            )  # If only one name is provided, assume it's the first name
 
     def extract_show_data(self, plex_show):
         retries = 3
