@@ -3,30 +3,30 @@
 {% block title %}Plex Content{% endblock %}
 
 {% block content %}
-<div>
-    <h1>Plex Content</h1>
-    <div class="container">
-        <div class="column">
-            <h2>Movies</h2>
-            <ul>
-                {% for movie in movies %}
-                    <li>
-                        <a href="{% url 'movie_detail' movie.id %}">{{ movie.title }}</a> ({{ movie.year }})
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
+    <div>
+        <h1>Plex Content</h1>
+        <div class="container">
+            <div class="column">
+                <h2>Movies</h2>
+                <ul>
+                    {% for movie in movies %}
+                        <li>
+                            <a href="{% url 'movie_detail' movie.id %}">{{ movie.title }}</a> ({{ movie.year }})
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
 
-        <div class="column">
-            <h2>TV Shows</h2>
-            <ul>
-                {% for show in shows %}
-                    <li>
-                        <a href="{% url 'show_detail' show.id %}">{{ show.title }}</a> ({{ show.year }})
-                    </li>
-                {% endfor %}
-            </ul>
+            <div class="column">
+                <h2>TV Shows</h2>
+                <ul>
+                    {% for show in shows %}
+                        <li>
+                            <a href="{% url 'show_detail' show.id %}">{{ show.title }}</a> ({{ show.year }})
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
     </div>
-</div>
 {% endblock %}

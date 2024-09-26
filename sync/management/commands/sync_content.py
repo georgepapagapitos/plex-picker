@@ -1,49 +1,73 @@
 # sync/management/commands/sync_content.py
 
-import concurrent.futures
+import time
 
+from django.core.cache import cache
+from django.core.management import call_command
 from django.core.management.base import BaseCommand
 
-from sync.management.commands.sync_movies import Command as SyncMoviesCommand
-from sync.management.commands.sync_shows import Command as SyncShowsCommand
 from utils.logger_utils import setup_logging
 
 logger = setup_logging(__name__)
 
+LOCK_EXPIRE = 60 * 5  # Lock expires in 5 minutes
+
 
 class Command(BaseCommand):
-    # python manage.py sync_content
+    help = "Sync Plex movies and TV shows with database locking"
 
-    help = "Sync Plex movies and TV shows in parallel"
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--movies-only",
+            action="store_true",
+            help="Sync only movies",
+        )
+        parser.add_argument(
+            "--shows-only",
+            action="store_true",
+            help="Sync only TV shows",
+        )
 
-    def handle(self, *args, **kwargs):
+    def handle(self, *args, **options):
         logger.info("Starting combined sync for movies and shows.")
         try:
-            # Create the movie and show sync command objects
-            sync_movies_command = SyncMoviesCommand()
-            sync_shows_command = SyncShowsCommand()
+            tasks = []
 
-            # Define the tasks to run in parallel
-            tasks = {
-                "Sync Movies": sync_movies_command.handle,
-                "Sync Shows": sync_shows_command.handle,
-            }
+            if not options["shows_only"]:
+                tasks.append(("Sync Movies", "sync_movies"))
 
-            # Use ThreadPoolExecutor to run tasks in parallel
-            with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-                # Submit tasks to the executor
-                futures = {executor.submit(task): name for name, task in tasks.items()}
+            if not options["movies_only"]:
+                tasks.append(("Sync Shows", "sync_shows"))
 
-                for future in concurrent.futures.as_completed(futures):
-                    task_name = futures[future]
-                    try:
-                        # Wait for each future to complete and log the result
-                        future.result()
-                        logger.info(f"{task_name} completed successfully.")
-                    except Exception as exc:
-                        logger.error(f"{task_name} generated an exception: {exc}")
+            if not tasks:
+                logger.warning(
+                    "No sync tasks selected. Please run without --movies-only or --shows-only, or use the individual sync commands."
+                )
+                return
+
+            for task_name, task_command in tasks:
+                self.run_task_with_lock(task_name, task_command)
 
             logger.info("Combined sync for movies and shows completed.")
-
         except Exception as e:
             logger.error(f"Error during combined sync: {str(e)}")
+
+    def run_task_with_lock(self, task_name, task_command):
+        lock_id = f"lock_{task_command}"
+
+        # Try to acquire the lock
+        acquire_lock = lambda: cache.add(lock_id, "true", LOCK_EXPIRE)
+        release_lock = lambda: cache.delete(lock_id)
+
+        got_lock = acquire_lock()
+        if got_lock:
+            try:
+                logger.info(f"Starting {task_name}")
+                call_command(task_command)
+                logger.info(f"{task_name} completed successfully.")
+            finally:
+                release_lock()
+        else:
+            logger.warning(
+                f"{task_name} is already being run by another process. Skipping."
+            )

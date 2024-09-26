@@ -1,11 +1,9 @@
 # sync/models/show.py
-
 from datetime import datetime
 
 from django.core.exceptions import ValidationError
 from django.db import models
 
-# Importing Genre directly from its module to avoid circular import
 from sync.models.genre import Genre
 
 
@@ -22,7 +20,7 @@ class Show(models.Model):
     title = models.CharField(max_length=255)
     summary = models.TextField(blank=True, null=True)
     year = models.IntegerField(blank=True, null=True)
-    duration = models.IntegerField(blank=True, null=True)
+    duration = models.IntegerField(blank=True, null=True)  # Duration in milliseconds
     poster_url = models.URLField(blank=True, null=True)
     genres = models.ManyToManyField(Genre, related_name="shows")
     plex_key = models.CharField(max_length=255, unique=True)
@@ -35,11 +33,9 @@ class Show(models.Model):
     def formatted_duration(self):
         if self.duration is None:
             return "N/A"
-
         # Convert milliseconds to total minutes
         total_minutes = self.duration // (1000 * 60)  # Convert to minutes
         hours, minutes = divmod(total_minutes, 60)
-
         return f"{hours}h {minutes}m" if hours > 0 else f"{minutes}m"
 
     def formatted_genres(self):
@@ -49,7 +45,7 @@ class Show(models.Model):
         current_year = datetime.now().year
         if self.year and (self.year < 1888 or self.year > current_year):
             raise ValidationError("Year must be between 1888 and the current year.")
-        if self.rotten_tomatoes_rating and not (
+        if self.rotten_tomatoes_rating is not None and not (
             0 <= self.rotten_tomatoes_rating <= 100
         ):
             raise ValidationError("Rating must be between 0 and 100.")

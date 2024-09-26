@@ -1,3 +1,5 @@
+# picker/views/tests/test_plex_content_view.py
+
 from unittest.mock import patch
 
 from django.test import TestCase
@@ -6,7 +8,7 @@ from django.urls import reverse
 from sync.models import Genre, Movie, Show
 
 
-class FetchPlexContentViewTests(TestCase):
+class PlexContentViewTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         # Create genres
@@ -40,8 +42,8 @@ class FetchPlexContentViewTests(TestCase):
         )
         cls.show.genres.add(comedy)
 
-    def test_fetch_plex_content_view_success(self):
-        response = self.client.get(reverse("fetch_plex_content"))
+    def test_plex_content_view_success(self):
+        response = self.client.get(reverse("plex_content"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Plex Content")
         self.assertContains(response, self.movie.title)
@@ -49,12 +51,12 @@ class FetchPlexContentViewTests(TestCase):
 
     @patch("sync.models.Movie.objects.all")
     @patch("sync.models.Show.objects.all")
-    def test_fetch_plex_content_view_error(self, mock_show, mock_movie):
+    def test_plex_content_view_error(self, mock_show, mock_movie):
         # Simulate an error by making the queries raise an exception
         mock_movie.side_effect = Exception("Database error")
         mock_show.side_effect = Exception("Database error")
 
-        response = self.client.get(reverse("fetch_plex_content"))
+        response = self.client.get(reverse("plex_content"))
         self.assertEqual(
             response.status_code, 200
         )  # Expecting 200 since it renders an error page

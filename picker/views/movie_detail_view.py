@@ -1,6 +1,5 @@
 # picker/views/movie_detail_view.py
 
-import logging
 from typing import Any, Dict
 
 from django.http import HttpRequest, HttpResponse
@@ -17,6 +16,7 @@ def movie_detail_view(request: HttpRequest, movie_id: int) -> HttpResponse:
         movie: Movie = get_object_or_404(Movie, pk=movie_id)
 
         # Capture the parameters for redirection
+        actors = movie.actors.all().order_by("last_name", "first_name")
         random_movies = request.GET.get("movies", "")
         genre = request.GET.get("genre", "")
         count = request.GET.get("count", 1)
@@ -25,6 +25,7 @@ def movie_detail_view(request: HttpRequest, movie_id: int) -> HttpResponse:
 
         context: Dict[str, Any] = {
             "movie": movie,
+            "formatted_actors": movie.formatted_actors(),
             "random_movies": random_movies,
             "genre": genre,
             "count": count,

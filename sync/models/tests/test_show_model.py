@@ -1,7 +1,6 @@
 from django.test import TestCase
 
-from sync.models.genre import Genre
-from sync.models.show import Show
+from sync.models import Genre, Show
 
 
 class ShowModelTests(TestCase):
