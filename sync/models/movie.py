@@ -1,4 +1,5 @@
 # sync/models/movie.py
+
 from datetime import datetime
 
 from django.core.exceptions import ValidationError

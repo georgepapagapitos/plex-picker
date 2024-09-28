@@ -1,11 +1,12 @@
+# utils/tests/test_trailer_utils.py
+
 from unittest.mock import MagicMock, patch
 
-import requests
 from django.test import TestCase, override_settings
 
 from sync.models.genre import Genre
 from sync.models.movie import Movie
-from utils.trailer_utils import TrailerFetcher, trailer_fetcher
+from utils.trailer_utils import trailer_fetcher
 
 
 @override_settings(
