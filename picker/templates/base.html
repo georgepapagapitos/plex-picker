@@ -1,3 +1,5 @@
+<!-- picker/templates/base.html -->
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -36,5 +38,6 @@
         </footer>
         <script src="{% static 'js/modal.js' %}"></script>
         <script src="{% static 'js/spinner.js' %}"></script>
+        {% block script %}{% endblock %}
     </body>
 </html>

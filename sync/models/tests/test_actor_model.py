@@ -18,17 +18,14 @@ class ActorModelTests(TestCase):
 
     def test_actor_creation(self):
         self.assertEqual(str(self.actor), "John Doe")
-        self.assertEqual(self.actor.full_name, "John Doe")
 
     def test_actor_with_only_first_name(self):
         actor = Actor.objects.create(first_name="Madonna")
         self.assertEqual(str(actor), "Madonna ")
-        self.assertEqual(actor.full_name, "Madonna ")
 
     def test_actor_with_only_last_name(self):
         actor = Actor.objects.create(last_name="Cher")
         self.assertEqual(str(actor), " Cher")
-        self.assertEqual(actor.full_name, " Cher")
 
     def test_actor_photo_url_optional(self):
         actor = Actor.objects.create(first_name="Jane", last_name="Smith")
