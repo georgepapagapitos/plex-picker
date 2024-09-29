@@ -27,6 +27,7 @@ class Show(models.Model):
     plex_key = models.CharField(max_length=255, unique=True)
     tmdb_id = models.PositiveIntegerField(blank=True, null=True)
     rotten_tomatoes_rating = models.FloatField(blank=True, null=True)
+    content_rating = models.CharField(max_length=10, blank=True, null=True)
 
     def __str__(self):
         return f"{self.title} ({self.year})"
@@ -39,6 +40,26 @@ class Show(models.Model):
         hours, minutes = divmod(total_minutes, 60)
         return f"{hours}h {minutes}m" if hours > 0 else f"{minutes}m"
 
+    def formatted_actors(self, limit=None):
+        actors = self.actors.all().order_by("last_name", "first_name")
+        if limit:
+            actors = actors[:limit]
+
+        if not actors:
+            return "No cast information available"
+
+        def format_actor_name(actor):
+            if actor.first_name and actor.last_name:
+                return f"{actor.first_name} {actor.last_name}"
+            elif actor.first_name:
+                return actor.first_name
+            elif actor.last_name:
+                return actor.last_name
+            else:
+                return "Unknown Actor"
+
+        return ", ".join(format_actor_name(actor) for actor in actors)
+
     def formatted_genres(self):
         return ", ".join(genre.name for genre in self.genres.all())
 
@@ -50,3 +71,7 @@ class Show(models.Model):
             0 <= self.rotten_tomatoes_rating <= 100
         ):
             raise ValidationError("Rating must be between 0 and 100.")
+
+    @property
+    def type(self):
+        return "show"

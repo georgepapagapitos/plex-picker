@@ -1,3 +1,5 @@
+// static/js/spinner.js
+
 document.addEventListener("DOMContentLoaded", function() {
     const loadingDiv = document.getElementById('loading');
     const moviesContainer = document.getElementById('moviesContainer');

@@ -16,7 +16,8 @@ def show_detail_view(request: HttpRequest, show_id: int) -> HttpResponse:
         show: Show = get_object_or_404(Show, pk=show_id)
 
         context: Dict[str, Any] = {
-            "show": show,
+            "media": show,
+            "formatted_actors": show.formatted_actors(),
         }
 
         return render(request, "show_detail.html", context)

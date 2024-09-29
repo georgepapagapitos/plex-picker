@@ -1,4 +1,4 @@
-# picker/forms/tests/test_forms.py
+# picker/forms/tests/test_search_form.py
 
 from django.test import TestCase
 
@@ -37,6 +37,12 @@ class SearchFormTests(TestCase):
         form_data = {"query": "   Interstellar   "}
         form = SearchForm(data=form_data)
         self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data["query"], "Interstellar")
+
+    def test_form_widget_attributes(self):
+        """Test that the form widget has the correct attributes."""
+        form = SearchForm()
         self.assertEqual(
-            form.cleaned_data["query"], "Interstellar"
-        )  # Adjusted to match cleaned value
+            form.fields["query"].widget.attrs["placeholder"],
+            "Search for movies, shows, or actors...",
+        )

@@ -1,84 +1,146 @@
-from django import forms
-from django.db.models import Max, Min
+# picker/forms/tests/test_random_movie_form.py
 
-from sync.models import Movie
-from sync.models.genre import Genre
+from django.test import TestCase
+
+from picker.forms.random_movie_form import RandomMovieForm
+from sync.models import Genre, Movie
 
 
-class RandomMovieForm(forms.Form):
-    GENRE_CHOICES = [("", "Any")]
-    genre = forms.ChoiceField(choices=GENRE_CHOICES, required=False)
-    count = forms.ChoiceField(choices=[(i, str(i)) for i in range(1, 5)], initial=1)
+class RandomMovieFormTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        # Create some test data
+        genre1 = Genre.objects.create(name="Action")
+        genre2 = Genre.objects.create(name="Comedy")
 
-    min_rotten_tomatoes_rating = forms.ChoiceField(required=False)
-    max_duration = forms.ChoiceField(required=False)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        genres_with_movies = (
-            Genre.objects.filter(movies__isnull=False)
-            .distinct()
-            .order_by("name")
-            .values_list("name", flat=True)
+        # Create movies with unique plex_key values
+        movie1 = Movie.objects.create(
+            title="Test Movie 1",
+            year=2020,
+            duration=7200000,  # 2 hours
+            rotten_tomatoes_rating=85,
+            plex_key="movie1",
         )
-        self.fields["genre"].choices += [(genre, genre) for genre in genres_with_movies]
-        self.fields["min_rotten_tomatoes_rating"].choices = self.get_rating_choices()
-        self.fields["max_duration"].choices = self.get_duration_choices()
+        movie1.genres.add(genre1)
 
-    def clean_min_rotten_tomatoes_rating(self):
-        value = self.cleaned_data.get("min_rotten_tomatoes_rating")
-        return int(value) if value else None
-
-    def clean_max_duration(self):
-        value = self.cleaned_data.get("max_duration")
-        return int(value) if value else ""  # Change to return empty string
-
-    def get_duration_choices(self):
-        durations = Movie.objects.aggregate(
-            min_duration=Min("duration"), max_duration=Max("duration")
+        movie2 = Movie.objects.create(
+            title="Test Movie 2",
+            year=2021,
+            duration=5400000,  # 1.5 hours
+            rotten_tomatoes_rating=75,
+            plex_key="movie2",
         )
+        movie2.genres.add(genre2)
 
-        min_duration = (
-            int(durations["min_duration"] // 60000) if durations["min_duration"] else 0
+    def test_form_fields(self):
+        form = RandomMovieForm()
+        self.assertIn("genre", form.fields)
+        self.assertIn("count", form.fields)
+        self.assertIn("min_rotten_tomatoes_rating", form.fields)
+        self.assertIn("max_duration", form.fields)
+        self.assertIn("min_year", form.fields)
+        self.assertIn("max_year", form.fields)
+
+    def test_genre_choices(self):
+        form = RandomMovieForm()
+        genre_choices = [choice[1] for choice in form.fields["genre"].choices]
+        self.assertIn("Any", genre_choices)
+        self.assertIn("Action", genre_choices)
+        self.assertIn("Comedy", genre_choices)
+
+    def test_count_choices(self):
+        form = RandomMovieForm()
+        count_choices = [int(choice[1]) for choice in form.fields["count"].choices]
+        self.assertEqual(count_choices, [1, 2, 3, 4])
+
+    def test_rating_choices(self):
+        form = RandomMovieForm()
+        rating_choices = [
+            choice[1] for choice in form.fields["min_rotten_tomatoes_rating"].choices
+        ]
+        self.assertIn("Any", rating_choices)
+        self.assertIn("75%", rating_choices)
+        self.assertIn("85%", rating_choices)
+
+    def test_duration_choices(self):
+        form = RandomMovieForm()
+        duration_choices = [choice[1] for choice in form.fields["max_duration"].choices]
+        self.assertIn("Any", duration_choices)
+        self.assertIn("1h 30m", duration_choices)
+        self.assertIn("2h", duration_choices)
+
+    def test_year_choices(self):
+        form = RandomMovieForm()
+        year_choices = [choice[1] for choice in form.fields["min_year"].choices]
+        self.assertIn("Any", year_choices)
+        self.assertIn("2020", year_choices)
+        self.assertIn("2021", year_choices)
+
+    def test_clean_min_rotten_tomatoes_rating(self):
+        form = RandomMovieForm({"min_rotten_tomatoes_rating": "75", "count": "1"})
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data["min_rotten_tomatoes_rating"], 75)
+
+    def test_clean_max_duration(self):
+        form = RandomMovieForm({"max_duration": "120", "count": "1"})
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data["max_duration"], 120)
+
+    def test_clean_min_year(self):
+        form = RandomMovieForm({"min_year": "2020", "count": "1"})
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data["min_year"], 2020)
+
+    def test_clean_max_year(self):
+        form = RandomMovieForm({"max_year": "2021", "count": "1"})
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data["max_year"], 2021)
+
+    def test_is_reset(self):
+        form = RandomMovieForm({"reset": True})
+        self.assertTrue(form.is_reset())
+
+    def test_form_initial_values(self):
+        form = RandomMovieForm(data={"genre": "Action", "count": "2"})
+        self.assertEqual(form.fields["genre"].initial, "Action")
+        self.assertEqual(form.fields["count"].initial, "2")
+
+    def test_form_validation(self):
+        form_data = {
+            "genre": "Action",
+            "count": "2",
+            "min_rotten_tomatoes_rating": "75",
+            "max_duration": "120",
+            "min_year": "2020",
+            "max_year": "2021",
+        }
+        form = RandomMovieForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+    def test_form_validation_with_empty_fields(self):
+        form_data = {
+            "genre": "",
+            "count": "1",
+            "min_rotten_tomatoes_rating": "",
+            "max_duration": "",
+            "min_year": "",
+            "max_year": "",
+        }
+        form = RandomMovieForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+    def test_clean_methods_with_empty_values(self):
+        form = RandomMovieForm(
+            {
+                "count": "1",
+                "min_rotten_tomatoes_rating": "",
+                "max_duration": "",
+                "min_year": "",
+                "max_year": "",
+            }
         )
-        max_duration = (
-            int(durations["max_duration"] // 60000) if durations["max_duration"] else 0
-        )
-
-        choices = [("", "Any")]
-
-        for hours in range(0, (max_duration // 60) + 1):
-            for minutes in range(0, 60, 30):
-                total_minutes = hours * 60 + minutes
-                if total_minutes < min_duration or total_minutes > max_duration:
-                    continue
-
-                if hours > 0 and minutes > 0:
-                    choices.append((total_minutes, f"{hours}h {minutes}m"))
-                elif hours > 0:
-                    choices.append((total_minutes, f"{hours}h"))
-                else:
-                    choices.append((total_minutes, f"{minutes}m"))
-
-        return choices
-
-    def get_rating_choices(self):
-        ratings = Movie.objects.aggregate(
-            min_rating=Min("rotten_tomatoes_rating"),
-            max_rating=Max("rotten_tomatoes_rating"),
-        )
-
-        min_rating = (
-            int(ratings["min_rating"]) if ratings["min_rating"] is not None else 0
-        )
-        max_rating = (
-            int(ratings["max_rating"]) if ratings["max_rating"] is not None else 100
-        )
-
-        choices = [("", "Any")]
-
-        for rating in range(min_rating, max_rating + 1, 10):
-            choices.append((rating, f"{rating}%"))
-
-        return choices
+        self.assertTrue(form.is_valid())
+        self.assertIsNone(form.cleaned_data["min_rotten_tomatoes_rating"])
+        self.assertIsNone(form.cleaned_data["max_duration"])
+        self.assertIsNone(form.cleaned_data["min_year"])
+        self.assertIsNone(form.cleaned_data["max_year"])

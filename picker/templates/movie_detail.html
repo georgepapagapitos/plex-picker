@@ -1,40 +1,25 @@
 <!-- picker/templates/movie_detail.html -->
 
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
-{% block title %}{{ movie.title }}{% endblock %}
+{% block title %}{{ movie.title }}{% endblock title %}
 
 {% block content %}
-    <div class="media-detail">
-        <h1>{{ movie.title }}</h1>
-        <img src="{{ movie.poster_url }}" alt="{{ movie.title }} poster" />
-        <p>{{ movie.summary }}</p>
-        <div class="media-info">
-            <p><strong>Duration:</strong> {{ movie.formatted_duration }}</p>
-            <p><strong>Genres:</strong> {{ movie.formatted_genres }}</p>
-            <p><strong>Cast:</strong> {{ formatted_actors }}</p>
-            <p><strong>Trailer:</strong> <a href="{{ movie.trailer_url }}">Watch here</a></p>
-            <p class="rotten-tomato-rating"><strong>Rotten Tomatoes:</strong> {{ movie.rotten_tomatoes_rating|floatformat:0 }}%
-                {% if movie.rotten_tomatoes_rating >= 85 %}
-                    🔥 <!-- Excellent Rating -->
-                {% elif movie.rotten_tomatoes_rating >= 70 %}
-                    😊 <!-- Very Good Rating -->
-                {% elif movie.rotten_tomatoes_rating >= 60 %}
-                    👍 <!-- Good Rating -->
-                {% elif movie.rotten_tomatoes_rating >= 50 %}
-                    😐 <!-- Average Rating -->
-                {% elif movie.rotten_tomatoes_rating >= 40 %}
-                    👎 <!-- Below Average Rating -->
-                {% else %}
-                    💩 <!-- Poor Rating -->
-                {% endif %}
-            </p>
-        </div>
-
-        {% if random_movies %}
-            <a href="{% url 'random_movie' %}?genre={{ genre }}&count={{ count }}&movies={{ random_movies }}&min_rotten_tomatoes_rating={{ min_rating }}&max_duration={{ max_duration }}" class="btn">Back to Random Movies</a>
-        {% endif %}
-
-        <a href="{% url 'plex_content' %}" class="btn">Back to Movie List</a>
+  <div class="relative min-h-screen bg-gray-900">
+    <!-- Background image with adjusted gradient overlay -->
+    <div class="absolute inset-0 bg-cover bg-center opacity-50" style="background-image: url('{{ media.poster_url }}');">
+      <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/90 to-gray-900/50"></div>
     </div>
-{% endblock %}
+
+    <!-- Content -->
+    <div class="relative z-10 pt-4 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-7xl mx-auto">
+        {% include "partials/_media_header.html" with media=media %}
+        {% include "partials/_media_summary.html" with media=media formatted_actors=formatted_actors %}
+        {% include "partials/_back_links.html" %}
+      </div>
+    </div>
+  </div>
+
+  {% include "partials/_trailer_modal.html" %}
+{% endblock content %}

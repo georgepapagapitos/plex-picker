@@ -18,11 +18,16 @@ def random_movie_view(request: HttpRequest):
         form = RandomMovieForm(request.GET or None)
         logger.debug(f"Form initialized with genres: {form.fields['genre'].choices}")
 
+        if form.is_reset():
+            return HttpResponseRedirect(reverse("random_movie"))
+
         # Get parameters with default values
         selected_genre = form.data.get("genre", "")
         count = max(1, min(int(form.data.get("count", 1)), 4))  # Limit count to max 4
         selected_rating = form.data.get("min_rotten_tomatoes_rating", "")
         selected_duration = form.data.get("max_duration", "")
+        selected_min_year = form.data.get("min_year", "")
+        selected_max_year = form.data.get("max_year", "")
         randomize = request.GET.get("randomize", "").lower() == "true"
         movie_ids = request.GET.get("movies", "")
 
@@ -38,6 +43,12 @@ def random_movie_view(request: HttpRequest):
             if selected_duration.isdigit():
                 movies = movies.filter(duration__lte=int(selected_duration) * 60 * 1000)
 
+            if selected_min_year.isdigit():
+                movies = movies.filter(year__gte=int(selected_min_year))
+
+            if selected_max_year.isdigit():
+                movies = movies.filter(year__lte=int(selected_max_year))
+
             logger.debug(f"Number of movies after filtering: {movies.count()}")
 
             if movies.exists():
@@ -46,7 +57,9 @@ def random_movie_view(request: HttpRequest):
 
                 # Redirect to the same view with selected movie IDs in the URL
                 return HttpResponseRedirect(
-                    f"{reverse('random_movie')}?genre={selected_genre}&count={count}&movies={movie_ids}&min_rotten_tomatoes_rating={selected_rating}&max_duration={selected_duration}"
+                    f"{reverse('random_movie')}?genre={selected_genre}&count={count}&movies={movie_ids}"
+                    f"&min_rotten_tomatoes_rating={selected_rating}&max_duration={selected_duration}"
+                    f"&min_year={selected_min_year}&max_year={selected_max_year}"
                 )
             else:
                 logger.warning("No movies found matching the criteria")
@@ -68,7 +81,10 @@ def random_movie_view(request: HttpRequest):
             "movie_ids": movie_ids,
             "min_rotten_tomatoes_rating": selected_rating,
             "max_duration": selected_duration,
+            "min_year": selected_min_year,
+            "max_year": selected_max_year,
         }
+        logger.debug(f"Rendering template with {len(selected_movies)} movies")
         return render(request, "random_movie.html", context)
 
     except Exception as e:

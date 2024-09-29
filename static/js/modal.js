@@ -1,37 +1,51 @@
+// static/js/modal.js
+
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("Document loaded");
+
     const modal = document.getElementById('trailerModal');
+    const buttons = document.querySelectorAll('.trailer-button');
+    const closeBtn = modal.querySelector('.close');
     const iframe = document.getElementById('trailerIframe');
-    const closeBtn = document.querySelector('.modal .close');
     const modalTitle = document.getElementById('modalMovieTitle');
 
-    // Open modal when button is clicked
-    document.querySelectorAll('.trailer-button').forEach(button => {
-        button.addEventListener('click', () => {
-            console.log("Button clicked");
+
+    function openModal(trailerUrl, movieTitle) {
+        modalTitle.textContent = movieTitle;
+        iframe.src = trailerUrl;
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.classList.add('overflow-hidden'); // Prevent scrolling on the body
+    }
+    
+    function closeModal() {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        iframe.src = ''; // Stop video playback
+        document.body.classList.remove('overflow-hidden'); // Restore scrolling on the body
+    }
+
+    buttons.forEach((button, index) => {
+        button.addEventListener('click', (event) => {
+            event.preventDefault();
             const trailerUrl = button.getAttribute('data-trailer-url');
-            const movieTitle = button.closest('.movie-container').querySelector('h2').innerText; // Get the movie title
-            
-            console.log("Trailer URL:", trailerUrl);
-            modalTitle.innerText = movieTitle;
-            iframe.src = trailerUrl;
-            modal.style.display = 'block';
+            const movieTitle = button.getAttribute('data-movie-title');
+            openModal(trailerUrl, movieTitle);
         });
     });
 
-    // Close modal when close button is clicked
-    closeBtn.addEventListener('click', () => {
-        console.log("Close button clicked");
-        modal.style.display = 'none';
-        iframe.src = ''; // Stop video playback
+    closeBtn.addEventListener('click', closeModal);
+
+    // Close modal when clicking outside of the modal content
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            closeModal();
+        }
     });
 
-    // Close modal when clicking outside of the modal
-    window.addEventListener('click', (event) => {
-        if (event.target === modal) {
-            console.log("Clicked outside modal");
-            modal.style.display = 'none';
-            iframe.src = ''; // Stop video playback
+    // Close modal on escape key press
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            closeModal();
         }
     });
 });

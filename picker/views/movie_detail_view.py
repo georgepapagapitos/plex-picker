@@ -16,7 +16,6 @@ def movie_detail_view(request: HttpRequest, movie_id: int) -> HttpResponse:
         movie: Movie = get_object_or_404(Movie, pk=movie_id)
 
         # Capture the parameters for redirection
-        actors = movie.actors.all().order_by("last_name", "first_name")
         random_movies = request.GET.get("movies", "")
         genre = request.GET.get("genre", "")
         count = request.GET.get("count", 1)
@@ -24,7 +23,7 @@ def movie_detail_view(request: HttpRequest, movie_id: int) -> HttpResponse:
         max_duration = request.GET.get("max_duration", "")
 
         context: Dict[str, Any] = {
-            "movie": movie,
+            "media": movie,
             "formatted_actors": movie.formatted_actors(),
             "random_movies": random_movies,
             "genre": genre,
@@ -32,9 +31,7 @@ def movie_detail_view(request: HttpRequest, movie_id: int) -> HttpResponse:
             "min_rating": min_rating,
             "max_duration": max_duration,
         }
-
         return render(request, "movie_detail.html", context)
-
     except Exception as e:
         logger.error(f"Error fetching movie with ID {movie_id}: {e}")
         return render(

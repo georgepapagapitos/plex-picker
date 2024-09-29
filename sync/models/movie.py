@@ -28,6 +28,7 @@ class Movie(models.Model):
     trailer_url = models.URLField(null=True, blank=True)
     tmdb_id = models.PositiveIntegerField(null=True, blank=True)
     rotten_tomatoes_rating = models.FloatField(null=True, blank=True)
+    content_rating = models.CharField(max_length=10, null=True, blank=True)
 
     def __str__(self):
         return f"{self.title} ({self.year})"
@@ -71,3 +72,9 @@ class Movie(models.Model):
             0 <= self.rotten_tomatoes_rating <= 100
         ):
             raise ValidationError("Rating must be between 0 and 100.")
+        if self.content_rating and len(self.content_rating) > 10:
+            raise ValidationError("Content rating must be 10 characters or less.")
+
+    @property
+    def type(self):
+        return "movie"
