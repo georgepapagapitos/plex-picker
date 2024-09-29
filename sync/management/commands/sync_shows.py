@@ -181,6 +181,7 @@ class Command(BaseCommand):
                         if plex_show.audienceRating
                         else None
                     ),
+                    "content_rating": plex_show.contentRating,
                 }
             except requests.exceptions.RequestException as e:
                 logger.warning(

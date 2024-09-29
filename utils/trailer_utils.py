@@ -11,10 +11,15 @@ logger = setup_logging(__name__)
 
 
 class TrailerFetcher:
-    def __init__(self):
-        self.tmdb_api_url = settings.TMDB_API_URL
-        self.tmdb_api_key = settings.TMDB_API_KEY
-        self.youtube_api_key = settings.YOUTUBE_API_KEY
+    def __init__(
+        self,
+        tmdb_api_url,
+        tmdb_api_key,
+        youtube_api_key,
+    ):
+        self.tmdb_api_url = tmdb_api_url
+        self.tmdb_api_key = tmdb_api_key
+        self.youtube_api_key = youtube_api_key
         self._youtube = None
 
     @property
@@ -77,10 +82,3 @@ class TrailerFetcher:
                 f"Existing trailer URL found for {movie.title}: {movie.trailer_url}"
             )
         return movie.trailer_url
-
-
-# Create a single instance to be used throughout the application
-trailer_fetcher = TrailerFetcher()
-
-# Example usage
-# trailer_url = trailer_fetcher.fetch_trailer_url(some_movie)

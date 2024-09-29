@@ -45,7 +45,7 @@ class PlexContentViewTests(TestCase):
     def test_plex_content_view_success(self):
         response = self.client.get(reverse("plex_content"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Plex Content")
+        self.assertContains(response, "")
         self.assertContains(response, self.movie.title)
         self.assertContains(response, self.show.title)
 

@@ -26,10 +26,22 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
-    - name: Install Dependencies
+    - name: Install Python Dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt --no-cache-dir
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: "22"
+    - name: Install Node.js Dependencies
+      working-directory: theme/static_src
+      run: |
+        npm ci
+    - name: Build Tailwind CSS
+      working-directory: theme/static_src
+      run: |
+        npx tailwindcss -i src/styles.css -o ../../static/css/dist/styles.css --minify
 
   test:
     runs-on: ubuntu-latest

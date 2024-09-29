@@ -49,7 +49,7 @@ class MovieDetailViewTests(TestCase):
         # Test if the correct movie object is passed in the context
         response = self.client.get(reverse("movie_detail", args=[self.movie.id]))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["movie"], self.movie)
+        self.assertEqual(response.context["media"], self.movie)
 
     def test_invalid_movie_data(self):
         # Test validation errors during movie creation

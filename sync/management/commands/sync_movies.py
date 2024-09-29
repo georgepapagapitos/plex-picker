@@ -120,4 +120,5 @@ class Command(BaseCommand):
                 ),
                 None,
             ),
+            "content_rating": plex_movie.contentRating,
         }

@@ -2,74 +2,59 @@
 
 {% extends "base.html" %}
 
-{% block title %}Random Movie Picker{% endblock %}
-
+{% block title %}PlexPicker{% endblock title %}
 {% block content %}
-    <!-- Genre and count selection form -->
-    <form method="GET" action="{% url 'random_movie' %}">
-        <div class="form-group">
-            {{ form.genre.label }} {{ form.genre }}
-            {{ form.count.label }} {{ form.count }}
-            {{ form.min_rotten_tomatoes_rating.label }} {{ form.min_rotten_tomatoes_rating }}
-            {{ form.max_duration.label }} {{ form.max_duration }}
-        </div>
-        <input type="hidden" name="randomize" value="true">
-        <input type="hidden" name="movies" value="{{ movie_ids }}">
-        <button type="submit">Pick Random Movies</button>
-    </form>
 
-    <!-- Loading spinner and message -->
-    <div id="loading" class="loading">
-        <p>Picking random movies...</p>
-        <div class="spinner"></div>
-    </div>
+    {% load add_class %}
 
-    <!-- Check if movies exist -->
-    {% if movies %}
-        <div class="movies-container" id="moviesContainer">
-            {% for movie in movies %}
-                <div class="movie-container">
-                    <a href="{% url 'movie_detail' movie.id %}?genre={{ genre }}&count={{ count }}&movies={{ movie_ids }}&min_rotten_tomatoes_rating={{ min_rating }}&max_duration={{ max_duration }}">
-                        <img src="{{ movie.poster_url }}" alt="{{ movie.title }} Poster" />
-                    </a>
-                    <div class="movie-details">
-                        <h2>{{ movie.title }} ({{ movie.year }})</h2>
-                        <p>{{ movie.summary }}</p>
-                        {% if movie.rotten_tomatoes_rating %}
-                            </div>
-                            <p class="rotten-tomato-rating"><strong>Rotten Tomatoes:</strong> {{ movie.rotten_tomatoes_rating|floatformat:0 }}%
-                                {% if movie.rotten_tomatoes_rating >= 85 %}
-                                    🔥 <!-- Excellent Rating -->
-                                {% elif movie.rotten_tomatoes_rating >= 70 %}
-                                    😊 <!-- Very Good Rating -->
-                                {% elif movie.rotten_tomatoes_rating >= 60 %}
-                                    👍 <!-- Good Rating -->
-                                {% elif movie.rotten_tomatoes_rating >= 50 %}
-                                    😐 <!-- Average Rating -->
-                                {% elif movie.rotten_tomatoes_rating >= 40 %}
-                                    👎 <!-- Below Average Rating -->
-                                {% else %}
-                                    💩 <!-- Poor Rating -->
-                                {% endif %}
-                            </p>
-                        {% endif %}
-                        {% if movie.trailer_url %}
-                            <button class="trailer-button" data-trailer-url="https://www.youtube.com/embed/{{ movie.trailer_url|slice:'-11:' }}">Watch Trailer</button>
-                        {% else %}
-                            <p><strong>Watch Trailer:</strong> Trailer not available</p>
-                        {% endif %}
+    <div class="min-h-screen bg-gray-900 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <form id="movieFilterForm" method="get" action="{% url 'random_movie' %}" class="mb-8 bg-gray-800 p-6 rounded-lg shadow-lg">
+                <div class="flex flex-wrap gap-4">
+                    <div class="flex flex-col">
+                        {{ form.genre.label_tag }}
+                        {{ form.genre|add_class:"bg-gray-700 text-gray-200 placeholder-gray-400 border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500" }}
                     </div>
-            {% endfor %}
-        </div>
+                    <div class="flex flex-col">
+                        {{ form.count.label_tag }}
+                        {{ form.count|add_class:"bg-gray-700 text-gray-200 placeholder-gray-400 border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500" }}
+                    </div>
+                    <div class="flex flex-col">
+                        {{ form.min_rotten_tomatoes_rating.label_tag }}
+                        {{ form.min_rotten_tomatoes_rating|add_class:"bg-gray-700 text-gray-200 placeholder-gray-400 border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500" }}
+                    </div>
+                    <div class="flex flex-col">
+                        {{ form.max_duration.label_tag }}
+                        {{ form.max_duration|add_class:"bg-gray-700 text-gray-200 placeholder-gray-400 border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500" }}
+                    </div>
+                    <div class="flex flex-col">
+                        {{ form.min_year.label_tag }}
+                        {{ form.min_year|add_class:"bg-gray-700 text-gray-200 placeholder-gray-400 border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500" }}
+                    </div>
+                    <div class="flex flex-col">
+                        {{ form.max_year.label_tag }}
+                        {{ form.max_year|add_class:"bg-gray-700 text-gray-200 placeholder-gray-400 border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500" }}
+                    </div>
+                </div>
+                <input type="hidden" name="randomize" value="true">
+                <input type="hidden" name="movies" value="{{ movie_ids }}">
+                <div class="mt-4 flex gap-4">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Pick Random Movies</button>
+                    <button type="submit" name="reset" value="true" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Reset Filters</button>
+                </div>
+            </form>
 
-        <div id="trailerModal" class="modal">
-            <div class="modal-content">
-                <span class="close">&times;</span>
-                <h3 id="modalMovieTitle"></h3>
-                <iframe id="trailerIframe" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            </div>
+            {% if movies %}
+                {% for movie in movies %}
+                    <div class="p-8">
+                        {% include "partials/_media_header.html" with media=movie poster_link=True %}
+                        {% include "partials/_rotten_tomatoes_rating.html" with media=movie %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-white text-center">No movies found. Please adjust your filters and try again.</p>
+            {% endif %}
         </div>
-    {% else %}
-        <p>No movies found. Please select a genre and number of movies, then try again.</p>
-    {% endif %}
-{% endblock %}
+    </div>
+    {% include "partials/_trailer_modal.html" %}
+{% endblock content %}
