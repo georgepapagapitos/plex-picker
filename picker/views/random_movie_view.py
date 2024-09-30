@@ -1,7 +1,8 @@
 # picker/views/random_movie_view.py
 
-from django.http import HttpRequest, HttpResponseRedirect
+from django.http import HttpRequest, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
+from django.template.loader import render_to_string
 from django.urls import reverse
 
 from picker.forms import RandomMovieForm
@@ -55,6 +56,11 @@ def random_movie_view(request: HttpRequest):
                 selected_movies = get_random_movies(movies, count)
                 movie_ids = ",".join(str(movie.id) for movie in selected_movies)
 
+                # Limit the summary length for each selected movie
+                for movie in selected_movies:
+                    if len(movie.summary) > 100:
+                        movie.summary = movie.summary[:100] + "..."
+
                 # Redirect to the same view with selected movie IDs in the URL
                 return HttpResponseRedirect(
                     f"{reverse('random_movie')}?genre={selected_genre}&count={count}&movies={movie_ids}"
@@ -68,9 +74,22 @@ def random_movie_view(request: HttpRequest):
             # If movie IDs are provided, retrieve movies from those IDs
             movie_id_list = [int(id) for id in movie_ids.split(",") if id.isdigit()]
             selected_movies = list(Movie.objects.filter(id__in=movie_id_list))
+
+            # Limit the summary length for each selected movie
+            for movie in selected_movies:
+                if len(movie.summary) > 200:
+                    movie.summary = movie.summary[:200] + "..."
+
             logger.debug(
                 f"Movies retrieved from IDs: {[m.title for m in selected_movies]}"
             )
+
+        # Check if it's an AJAX request
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            html = render_to_string(
+                "partials/_movie_list.html", {"movies": selected_movies}
+            )
+            return JsonResponse({"html": html})
 
         # Prepare the context for rendering the template
         context = {
@@ -85,9 +104,10 @@ def random_movie_view(request: HttpRequest):
             "max_year": selected_max_year,
         }
         logger.debug(f"Rendering template with {len(selected_movies)} movies")
-        return render(request, "random_movie.html", context)
-
+        return render(request, "random_movie/random_movie.html", context)
     except Exception as e:
         # Log any exceptions that occur during processing
         logger.error(f"Error fetching random movie: {str(e)}")
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return JsonResponse({"error": str(e)}, status=500)
         return render(request, "error.html", {"error": str(e)})
