@@ -44,5 +44,5 @@ class SearchFormTests(TestCase):
         form = SearchForm()
         self.assertEqual(
             form.fields["query"].widget.attrs["placeholder"],
-            "Search for movies, shows, or actors...",
+            "Search Movies & TV",
         )

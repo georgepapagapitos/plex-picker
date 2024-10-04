@@ -1,0 +1,7 @@
+<!-- picker/templates/random_movie/partials/_random_movie_grid.html-->
+
+<div class="flex flex-wrap justify-center -mx-2">
+    {% for movie in movies %}
+        {% include "random_movie/partials/_random_movie_card.html" with movie=movie %}
+    {% endfor %}
+</div>

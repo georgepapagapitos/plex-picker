@@ -16,36 +16,27 @@ logger = setup_logging(__name__)
 @require_GET
 def plex_content_view(request: HttpRequest) -> HttpResponse:
     try:
-        # Create an instance of SearchForm
         search_form = SearchForm(request.GET or None)
-
-        # Fetch all movies and TV shows from the local database
         movies = Movie.objects.all()
         shows = Show.objects.all()
 
-        # Apply search filter if the form is valid and the query is not empty
         if search_form.is_valid() and search_form.cleaned_data["query"].strip():
             query = search_form.cleaned_data["query"]
             query_parts = query.split()
 
-            # Create Q objects for various search conditions
             title_query = Q(title__icontains=query)
             actor_query = Q()
 
-            # Handle full name and partial name searches
             if len(query_parts) > 1:
-                # For multi-word queries, search for full name matches
                 actor_query |= Q(actors__first_name__icontains=query_parts[0]) & Q(
                     actors__last_name__icontains=query_parts[-1]
                 )
 
-            # Always include partial name matches
             for part in query_parts:
                 actor_query |= Q(actors__first_name__icontains=part) | Q(
                     actors__last_name__icontains=part
                 )
 
-            # Combine title and actor queries
             combined_query = title_query | actor_query
 
             movies = movies.filter(combined_query).distinct()
@@ -54,11 +45,9 @@ def plex_content_view(request: HttpRequest) -> HttpResponse:
         movies = movies.order_by("title")
         shows = shows.order_by("title")
 
-        # Set default page sizes
-        movies_per_page = 20
-        shows_per_page = 20
+        movies_per_page = 10
+        shows_per_page = 10
 
-        # Pagination
         movie_page_number = request.GET.get("movie_page", 1)
         show_page_number = request.GET.get("show_page", 1)
 
@@ -79,14 +68,12 @@ def plex_content_view(request: HttpRequest) -> HttpResponse:
         except EmptyPage:
             shows_page = show_paginator.page(show_paginator.num_pages)
 
-        # Create context dictionary to pass data to the template
         context = {
             "movies_page": movies_page,
             "shows_page": shows_page,
             "search_form": search_form,
         }
 
-        # Check if the request is an AJAX request
         if request.headers.get("X-Requested-With") == "XMLHttpRequest":
             response_data = {
                 "movies": [
@@ -105,8 +92,7 @@ def plex_content_view(request: HttpRequest) -> HttpResponse:
             }
             return JsonResponse(response_data)
 
-        # Render the 'plex_content.html' template with the fetched context
-        return render(request, "plex_content.html", context)
+        return render(request, "plex_content/plex_content.html", context)
 
     except Exception as e:
         logger.error(f"Unexpected error: {e}")

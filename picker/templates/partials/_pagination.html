@@ -1,21 +1,17 @@
 <!-- picker/templates/partials/_pagination.html -->
 
 {% if page.paginator.num_pages > 1 %}
-    <div class="pagination {{ page_type }}-pagination mt-4">
-        <span class="step-links flex items-center justify-center space-x-2">
-            {% if page.has_previous %}
-                <a href="?{{ page_type }}_page=1{% if search_form.query.value %}&query={{ search_form.query.value }}{% endif %}" data-page="1" class="first-page px-3 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500">« First</a>
-                <a href="?{{ page_type }}_page={{ page.previous_page_number }}{% if search_form.query.value %}&query={{ search_form.query.value }}{% endif %}" data-page="{{ page.previous_page_number }}" class="previous-page px-3 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500">Previous</a>
-            {% endif %}
-
-            <span class="current-page text-gray-400">
-                Page {{ page.number }} of {{ page.paginator.num_pages }}
-            </span>
-
-            {% if page.has_next %}
-                <a href="?{{ page_type }}_page={{ page.next_page_number }}{% if search_form.query.value %}&query={{ search_form.query.value }}{% endif %}" data-page="{{ page.next_page_number }}" class="next-page px-3 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500">Next</a>
-                <a href="?{{ page_type }}_page={{ page.paginator.num_pages }}{% if search_form.query.value %}&query={{ search_form.query.value }}{% endif %}" data-page="{{ page.paginator.num_pages }}" class="last-page px-3 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500">Last »</a>
-            {% endif %}
+    <span class="step-links flex items-center justify-center space-x-2">
+        {% if page.has_previous %}
+            <a href="#" data-page="1" data-type="{{ page_type }}" class="first-page px-3 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500">« First</a>
+            <a href="#" data-page="{{ page.previous_page_number }}" data-type="{{ page_type }}" class="previous-page px-3 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500">Previous</a>
+        {% endif %}
+        <span class="current-page text-gray-400">
+            Page {{ page.number }} of {{ page.paginator.num_pages }}
         </span>
-    </div>
+        {% if page.has_next %}
+            <a href="#" data-page="{{ page.next_page_number }}" data-type="{{ page_type }}" class="next-page px-3 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500">Next</a>
+            <a href="#" data-page="{{ page.paginator.num_pages }}" data-type="{{ page_type }}" class="last-page px-3 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500">Last »</a>
+        {% endif %}
+    </span>
 {% endif %}
