@@ -173,3 +173,12 @@ cython_debug/
 
 # Mac OS
 .DS_Store
+
+
+static/css/dist/
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.idea/
+config.local.py

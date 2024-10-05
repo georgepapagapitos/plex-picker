@@ -17,7 +17,7 @@ def show_detail_view(request: HttpRequest, show_id: int) -> HttpResponse:
 
         context: Dict[str, Any] = {
             "media": show,
-            "formatted_actors": show.formatted_actors(),
+            "formatted_actors": show.formatted_actors(limit=5),
         }
 
         return render(request, "show_detail.html", context)

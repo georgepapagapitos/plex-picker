@@ -1,5 +1,6 @@
 # sync/management/commands/sync_content.py
 
+from django.conf import settings
 from django.core.cache import cache
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
@@ -7,10 +8,11 @@ from django.core.management.base import BaseCommand
 from utils.logger_utils import setup_logging
 
 logger = setup_logging(__name__)
-LOCK_EXPIRE = 60 * 5  # Lock expires in 5 minutes
 
 
 class Command(BaseCommand):
+    # 1800 seconds (30 minutes):
+    # python manage.py sync_content --lock-timeout 1800
     help = "Sync Plex movies and TV shows with database locking"
 
     def add_arguments(self, parser):
@@ -24,8 +26,15 @@ class Command(BaseCommand):
             action="store_true",
             help="Sync only TV shows",
         )
+        parser.add_argument(
+            "--lock-timeout",
+            type=int,
+            default=getattr(settings, "SYNC_LOCK_TIMEOUT", 300),
+            help="Lock timeout in seconds (default: 300)",
+        )
 
     def handle(self, *args, **options):
+        self.lock_timeout = options["lock_timeout"]
         movies_only = options["movies_only"]
         shows_only = options["shows_only"]
 
@@ -77,7 +86,7 @@ class Command(BaseCommand):
 
     def run_task_with_lock(self, task_name, task_command, movies_only, shows_only):
         lock_id = f"lock_{task_command}"
-        acquire_lock = lambda: cache.add(lock_id, "true", LOCK_EXPIRE)
+        acquire_lock = lambda: cache.add(lock_id, "true", self.lock_timeout)
         release_lock = lambda: cache.delete(lock_id)
         got_lock = acquire_lock()
 
