@@ -11,11 +11,9 @@ from sync.models import Genre, Movie, Show
 class PlexContentViewTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        # Create genres
         drama = Genre.objects.create(name="Drama")
         comedy = Genre.objects.create(name="Comedy")
 
-        # Create sample movie for testing
         cls.movie = Movie.objects.create(
             title="Test Movie",
             summary="A summary of the test movie.",
@@ -28,8 +26,6 @@ class PlexContentViewTests(TestCase):
             rotten_tomatoes_rating=8.5,
         )
         cls.movie.genres.add(drama)
-
-        # Create sample show for testing
         cls.show = Show.objects.create(
             title="Test Show",
             summary="A summary of the test show.",
@@ -52,14 +48,11 @@ class PlexContentViewTests(TestCase):
     @patch("sync.models.Movie.objects.all")
     @patch("sync.models.Show.objects.all")
     def test_plex_content_view_error(self, mock_show, mock_movie):
-        # Simulate an error by making the queries raise an exception
         mock_movie.side_effect = Exception("Database error")
         mock_show.side_effect = Exception("Database error")
 
         response = self.client.get(reverse("plex_content"))
-        self.assertEqual(
-            response.status_code, 200
-        )  # Expecting 200 since it renders an error page
+        self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Unexpected Error")
         self.assertContains(
             response, "An unexpected error occurred. Please try again later."

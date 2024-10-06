@@ -182,3 +182,4 @@ static/css/dist/
 .env.production.local
 .idea/
 config.local.py
+media/

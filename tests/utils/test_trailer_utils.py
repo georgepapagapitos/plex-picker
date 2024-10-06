@@ -1,6 +1,5 @@
 # tests/utils/test_trailer_utils.py
 
-import unittest
 from unittest.mock import MagicMock, patch
 
 import requests
@@ -20,7 +19,6 @@ from utils.trailer_utils import TrailerFetcher
 class TestTrailerFetcher(TestCase):
     @classmethod
     def setUpTestData(cls):
-        # Create Genre instances
         action = Genre.objects.create(name="Action")
         comedy = Genre.objects.create(name="Comedy")
         cls.movie1 = Movie.objects.create(
@@ -50,7 +48,6 @@ class TestTrailerFetcher(TestCase):
             "results": [{"type": "Trailer", "site": "YouTube", "key": "abc123"}]
         }
         mock_get.return_value = mock_response
-
         trailer_url = self.trailer_fetcher.get_tmdb_trailer_url(1)
         self.assertEqual(trailer_url, "https://www.youtube.com/embed/abc123")
         mock_get.assert_called_once_with(
@@ -62,7 +59,6 @@ class TestTrailerFetcher(TestCase):
     @patch("utils.trailer_utils.requests.get")
     def test_get_tmdb_trailer_url_failure(self, mock_get):
         mock_get.side_effect = requests.RequestException("API Error")
-
         trailer_url = self.trailer_fetcher.get_tmdb_trailer_url(1)
         self.assertIsNone(trailer_url)
 
@@ -80,7 +76,6 @@ class TestTrailerFetcher(TestCase):
                 }
             ]
         }
-
         trailer_url = self.trailer_fetcher.get_youtube_trailer_url("Movie Title")
         self.assertEqual(trailer_url, "https://www.youtube.com/watch?v=xyz789")
         mock_youtube.search.assert_called_once()
@@ -93,7 +88,6 @@ class TestTrailerFetcher(TestCase):
         mock_search = MagicMock()
         mock_youtube.search.return_value.list.return_value = mock_search
         mock_search.execute.side_effect = Exception("API Error")
-
         trailer_url = self.trailer_fetcher.get_youtube_trailer_url("Movie Title")
         self.assertIsNone(trailer_url)
         mock_youtube.search.assert_called_once()
@@ -104,7 +98,6 @@ class TestTrailerFetcher(TestCase):
     def test_fetch_trailer_url_tmdb_success(self, mock_youtube, mock_tmdb):
         mock_tmdb.return_value = "https://www.youtube.com/embed/abc123"
         mock_youtube.return_value = None
-
         trailer_url = self.trailer_fetcher.fetch_trailer_url(self.movie1)
         self.assertEqual(trailer_url, "https://www.youtube.com/embed/abc123")
         self.assertEqual(
@@ -118,7 +111,6 @@ class TestTrailerFetcher(TestCase):
     def test_fetch_trailer_url_youtube_fallback(self, mock_youtube, mock_tmdb):
         mock_tmdb.return_value = None
         mock_youtube.return_value = "https://www.youtube.com/watch?v=xyz789"
-
         trailer_url = self.trailer_fetcher.fetch_trailer_url(self.movie1)
         self.assertEqual(trailer_url, "https://www.youtube.com/watch?v=xyz789")
         self.assertEqual(
@@ -132,7 +124,6 @@ class TestTrailerFetcher(TestCase):
     def test_fetch_trailer_url_no_trailer_found(self, mock_youtube, mock_tmdb):
         mock_tmdb.return_value = None
         mock_youtube.return_value = None
-
         trailer_url = self.trailer_fetcher.fetch_trailer_url(self.movie1)
         self.assertIsNone(trailer_url)
         self.assertIsNone(self.movie1.trailer_url)
@@ -142,6 +133,5 @@ class TestTrailerFetcher(TestCase):
     def test_fetch_trailer_url_existing_url(self):
         self.movie1.trailer_url = "https://www.youtube.com/watch?v=existing123"
         self.movie1.save()
-
         trailer_url = self.trailer_fetcher.fetch_trailer_url(self.movie1)
         self.assertEqual(trailer_url, "https://www.youtube.com/watch?v=existing123")

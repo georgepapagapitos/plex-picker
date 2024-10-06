@@ -1,11 +1,11 @@
-<!-- picker/templates/error.html -->
+<!-- templates/error.html -->
 
 {% extends "base.html" %}
 
-{% block title %}Error - PlexPicker{% endblock title %}
+{% block title %}Error{% endblock title %}
 
 {% block content %}
-    <div>
+    <div class="p-8">
         <h1>Oops! Something went wrong.</h1>
         <p>Error Code: {{ error_code }}</p>
         <p>{{ error_message }}</p>

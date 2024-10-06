@@ -10,6 +10,7 @@ from sync.models.mixins import (
     FormattedActorsMixin,
     FormattedDurationMixin,
     FormattedGenresMixin,
+    ImageOptimizationMixin,
 )
 from sync.models.person import Person
 from sync.models.studio import Studio
@@ -19,6 +20,7 @@ class Show(
     FormattedActorsMixin,
     FormattedDurationMixin,
     FormattedGenresMixin,
+    ImageOptimizationMixin,
     models.Model,
 ):
     title = models.CharField(max_length=255)

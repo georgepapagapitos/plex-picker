@@ -1,9 +1,13 @@
 # picker/views/plex_content_view.py
 
+import json
+
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.core.serializers import serialize
 from django.db.models import Q
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import render
+from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET
 
 from picker.forms.search_form import SearchForm
@@ -13,6 +17,7 @@ from utils.logger_utils import setup_logging
 logger = setup_logging(__name__)
 
 
+@never_cache
 @require_GET
 def plex_content_view(request: HttpRequest) -> HttpResponse:
     try:
@@ -22,11 +27,8 @@ def plex_content_view(request: HttpRequest) -> HttpResponse:
 
         if search_form.is_valid() and search_form.cleaned_data["query"].strip():
             query = search_form.cleaned_data["query"]
-
             title_query = Q(title__icontains=query)
-
             combined_query = title_query
-
             movies = movies.filter(combined_query).distinct()
             shows = shows.filter(combined_query).distinct()
 
@@ -35,7 +37,6 @@ def plex_content_view(request: HttpRequest) -> HttpResponse:
 
         movies_per_page = 10
         shows_per_page = 10
-
         movie_page_number = request.GET.get("movie_page", 1)
         show_page_number = request.GET.get("show_page", 1)
 
@@ -56,22 +57,20 @@ def plex_content_view(request: HttpRequest) -> HttpResponse:
         except EmptyPage:
             shows_page = show_paginator.page(show_paginator.num_pages)
 
+        is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
+
         context = {
             "movies_page": movies_page,
             "shows_page": shows_page,
             "search_form": search_form,
+            "movie_total_pages": movie_paginator.num_pages,
+            "show_total_pages": show_paginator.num_pages,
         }
 
-        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        if is_ajax:
             response_data = {
-                "movies": [
-                    {"id": movie.id, "title": movie.title, "year": movie.year}
-                    for movie in movies_page
-                ],
-                "shows": [
-                    {"id": show.id, "title": show.title, "year": show.year}
-                    for show in shows_page
-                ],
+                "movies": json.loads(serialize("json", movies_page)),
+                "shows": json.loads(serialize("json", shows_page)),
                 "movie_page": movies_page.number,
                 "show_page": shows_page.number,
                 "movie_total_pages": movie_paginator.num_pages,
@@ -79,11 +78,13 @@ def plex_content_view(request: HttpRequest) -> HttpResponse:
                 "query": search_form.data.get("query", ""),
             }
             return JsonResponse(response_data)
-
-        return render(request, "plex_content/plex_content.html", context)
+        else:
+            return render(request, "plex_content/plex_content.html", context)
 
     except Exception as e:
         logger.error(f"Unexpected error: {e}")
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return JsonResponse({"error": str(e)}, status=500)
         return render(
             request,
             "error.html",

@@ -1,11 +1,12 @@
 # utils/trailer_utils.py
 
+import time
 from typing import Optional
 
 import googleapiclient.discovery
 import requests
+from googleapiclient.errors import HttpError
 
-from sync.models.movie import Movie
 from utils.logger_utils import setup_logging
 
 logger = setup_logging(__name__)
@@ -22,6 +23,8 @@ class TrailerFetcher:
         self.tmdb_api_key = tmdb_api_key
         self.youtube_api_key = youtube_api_key
         self._youtube = None
+        self.youtube_quota_exceeded = False
+        self.youtube_quota_reset_time = None
 
     @property
     def youtube(self):
@@ -48,6 +51,17 @@ class TrailerFetcher:
         return None
 
     def get_youtube_trailer_url(self, movie_title: str) -> Optional[str]:
+        if self.youtube_quota_exceeded:
+            if (
+                self.youtube_quota_reset_time
+                and time.time() < self.youtube_quota_reset_time
+            ):
+                logger.warning("YouTube quota exceeded. Skipping trailer fetching.")
+                return None
+            else:
+                # Reset quota flag if enough time has passed
+                self.youtube_quota_exceeded = False
+
         try:
             request = self.youtube.search().list(
                 q=f"{movie_title} official trailer",
@@ -60,11 +74,19 @@ class TrailerFetcher:
             for item in response.get("items", []):
                 if "trailer" in item["snippet"]["title"].lower():
                     return f"https://www.youtube.com/watch?v={item['id']['videoId']}"
+        except HttpError as e:
+            if e.resp.status == 403 and "quotaExceeded" in str(e):
+                logger.error("YouTube API quota exceeded.")
+                self.youtube_quota_exceeded = True
+                # Optional: Set a reset time (e.g., 24 hours from now)
+                self.youtube_quota_reset_time = time.time() + 24 * 60 * 60
+            else:
+                logger.error(f"YouTube API request failed for {movie_title}: {str(e)}")
         except Exception as e:
             logger.error(f"YouTube API request failed for {movie_title}: {str(e)}")
         return None
 
-    def fetch_trailer_url(self, movie: Movie) -> Optional[str]:
+    def fetch_trailer_url(self, movie) -> Optional[str]:
         if not movie.trailer_url:
             logger.debug(
                 f"Fetching trailer URL for {movie.title} (TMDB ID: {movie.tmdb_id})"

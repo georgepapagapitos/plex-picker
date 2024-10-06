@@ -8,17 +8,14 @@ from sync.models import Genre, Movie
 class MovieModelTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        # Create genres for the movie
         cls.action = Genre.objects.create(name="Action")
         cls.sci_fi = Genre.objects.create(name="Sci-Fi")
         cls.drama = Genre.objects.create(name="Drama")
-
-        # Create a movie with duration set in milliseconds
         cls.movie = Movie.objects.create(
             title="Inception",
             summary="A mind-bending thriller",
             year=2010,
-            duration=148 * 60 * 1000,  # 148 minutes in milliseconds
+            duration=148 * 60 * 1000,
             poster_url="http://example.com/inception.jpg",
             plex_key="plex_key_1",
             trailer_url="http://example.com/trailer.mp4",
@@ -42,7 +39,7 @@ class MovieModelTests(TestCase):
         self.assertIn(self.drama, self.movie.genres.all())
 
     def test_formatted_duration(self):
-        self.assertEqual(self.movie.formatted_duration(), "2h 28m")  # Expected format
+        self.assertEqual(self.movie.formatted_duration(), "2h 28m")
 
     def test_formatted_genres(self):
         expected_genres = "Action, Sci-Fi, Drama"
