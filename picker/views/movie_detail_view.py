@@ -24,7 +24,7 @@ def movie_detail_view(request: HttpRequest, movie_id: int) -> HttpResponse:
 
         context: Dict[str, Any] = {
             "media": movie,
-            "formatted_actors": movie.formatted_actors(),
+            "formatted_actors": movie.formatted_actors(limit=5),
             "random_movies": random_movies,
             "genre": genre,
             "count": count,

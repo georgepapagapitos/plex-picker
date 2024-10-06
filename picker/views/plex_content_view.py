@@ -22,22 +22,10 @@ def plex_content_view(request: HttpRequest) -> HttpResponse:
 
         if search_form.is_valid() and search_form.cleaned_data["query"].strip():
             query = search_form.cleaned_data["query"]
-            query_parts = query.split()
 
             title_query = Q(title__icontains=query)
-            actor_query = Q()
 
-            if len(query_parts) > 1:
-                actor_query |= Q(actors__first_name__icontains=query_parts[0]) & Q(
-                    actors__last_name__icontains=query_parts[-1]
-                )
-
-            for part in query_parts:
-                actor_query |= Q(actors__first_name__icontains=part) | Q(
-                    actors__last_name__icontains=part
-                )
-
-            combined_query = title_query | actor_query
+            combined_query = title_query
 
             movies = movies.filter(combined_query).distinct()
             shows = shows.filter(combined_query).distinct()

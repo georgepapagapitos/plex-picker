@@ -5,19 +5,22 @@ from datetime import datetime
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from sync.models import Genre
+from sync.models.genre import Genre
+from sync.models.mixins import (
+    FormattedActorsMixin,
+    FormattedDurationMixin,
+    FormattedGenresMixin,
+)
+from sync.models.person import Person
+from sync.models.studio import Studio
 
 
-class Movie(models.Model):
-    class Meta:
-        ordering = ["title"]
-        verbose_name = "Movie"
-        verbose_name_plural = "Movies"
-        indexes = [
-            models.Index(fields=["year"]),
-            models.Index(fields=["tmdb_id"]),
-        ]
-
+class Movie(
+    FormattedActorsMixin,
+    FormattedDurationMixin,
+    FormattedGenresMixin,
+    models.Model,
+):
     title = models.CharField(max_length=255)
     summary = models.TextField(null=True, blank=True)
     year = models.IntegerField(null=True, blank=True)
@@ -29,40 +32,67 @@ class Movie(models.Model):
     tmdb_id = models.PositiveIntegerField(null=True, blank=True)
     rotten_tomatoes_rating = models.FloatField(null=True, blank=True)
     content_rating = models.CharField(max_length=10, null=True, blank=True)
+    art = models.URLField(null=True, blank=True)
+    tagline = models.TextField(null=True, blank=True)
+    studio = models.ForeignKey(
+        Studio, on_delete=models.SET_NULL, null=True, related_name="movies"
+    )
+    audience_rating = models.FloatField(null=True, blank=True)
+    audience_rating_image = models.CharField(max_length=255, null=True, blank=True)
+    chapter_source = models.CharField(max_length=50, null=True, blank=True)
+    edition_title = models.CharField(max_length=255, null=True, blank=True)
+    original_title = models.CharField(max_length=255, null=True, blank=True)
+    originally_available_at = models.DateField(null=True, blank=True)
+    rating_image = models.CharField(max_length=255, null=True, blank=True)
+    view_count = models.IntegerField(default=0)
+
+    # Metadata fields
+    added_at = models.DateTimeField(null=True, blank=True)
+    updated_at = models.DateTimeField(null=True, blank=True)
+    last_viewed_at = models.DateTimeField(null=True, blank=True)
+    # TODO: add guid to sync
+    guid = models.CharField(max_length=255, null=True, blank=True)
+
+    # Settings fields
+    use_original_title = models.IntegerField(
+        default=-1
+    )  # -1: Library default, 0: No, 1: Yes
+    enable_credits_marker_generation = models.IntegerField(
+        default=-1
+    )  # -1: Library default, 0: Disabled
+
+    class Meta:
+        ordering = ["title"]
+        verbose_name = "Movie"
+        verbose_name_plural = "Movies"
+        indexes = [
+            models.Index(fields=["year"]),
+            models.Index(fields=["tmdb_id"]),
+        ]
 
     def __str__(self):
         return f"{self.title} ({self.year})"
 
-    def formatted_duration(self):
-        if self.duration is None:
-            return "N/A"
-        # Convert milliseconds to total minutes
-        total_minutes = self.duration // (1000 * 60)  # Convert to minutes
-        hours, minutes = divmod(total_minutes, 60)
-        return f"{hours}h {minutes}m" if hours > 0 else f"{minutes}m"
+    def get_roles_by_type(self, role_type):
+        return self.roles.filter(role_type=role_type).select_related("person")
 
-    def formatted_genres(self):
-        return ", ".join(genre.name for genre in self.genres.all())
+    def get_actors(self):
+        return self.get_roles_by_type("ACTOR")
 
-    def formatted_actors(self, limit=None):
-        actors = self.actors.all().order_by("last_name", "first_name")
-        if limit:
-            actors = actors[:limit]
+    def get_directors(self):
+        return self.get_roles_by_type("DIRECTOR")
 
-        if not actors:
-            return "No cast information available"
+    def get_producers(self):
+        return self.get_roles_by_type("PRODUCER")
 
-        def format_actor_name(actor):
-            if actor.first_name and actor.last_name:
-                return f"{actor.first_name} {actor.last_name}"
-            elif actor.first_name:
-                return actor.first_name
-            elif actor.last_name:
-                return actor.last_name
-            else:
-                return "Unknown Actor"
+    def get_writers(self):
+        return self.get_roles_by_type("WRITER")
 
-        return ", ".join(format_actor_name(actor) for actor in actors)
+    def get_people_by_role(self, role_type):
+        return Person.objects.filter(roles__movie=self, roles__role_type=role_type)
+
+    def get_cast(self):
+        return self.get_people_by_role("ACTOR")
 
     def clean(self):
         current_year = datetime.now().year  # Get the current year
@@ -78,3 +108,11 @@ class Movie(models.Model):
     @property
     def type(self):
         return "movie"
+
+    @property
+    def has_credits_marker(self):
+        return self.enable_credits_marker_generation == 1
+
+    @property
+    def locations(self):
+        return [media.file for media in self.media_set.all()]

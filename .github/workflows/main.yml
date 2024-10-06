@@ -16,11 +16,11 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Cache Python packages
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -29,11 +29,11 @@ jobs:
     - name: Install Python Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt --no-cache-dir
+        pip install -r requirements.txt
     - name: Set up Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v4
       with:
-        node-version: "22"
+        node-version: '20'
     - name: Install Node.js Dependencies
       working-directory: theme/static_src
       run: |
@@ -41,7 +41,7 @@ jobs:
     - name: Build Tailwind CSS
       working-directory: theme/static_src
       run: |
-        npx tailwindcss -i src/styles.css -o ../../static/css/dist/styles.css --minify
+        npx tailwindcss -i src/input.css -o ../../static/css/dist/styles.css --minify
 
   test:
     runs-on: ubuntu-latest
@@ -52,23 +52,25 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt --no-cache-dir
+        pip install -r requirements.txt
     - name: Create dummy .env file
       run: |
-        echo "TMDB_API_URL=https://api.themoviedb.org/3" > .env
+        echo "DJANGO_SECRET_KEY=dummy_secret_key" > .env
+        echo "TMDB_API_URL=https://api.themoviedb.org/3" >> .env
         echo "TMDB_API_KEY=dummy_tmdb_key" >> .env
         echo "YOUTUBE_API_KEY=dummy_youtube_key" >> .env
     - name: Apply Migrations
       run: python manage.py migrate
     - name: Run Tests
-      run: python manage.py test --verbosity=2
+      run: python manage.py test
       env:
+        DJANGO_SETTINGS_MODULE: plexpicker.settings.test
         TMDB_API_URL: ${{ secrets.TMDB_API_URL }}
         TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
         YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
@@ -82,7 +84,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install Dependencies

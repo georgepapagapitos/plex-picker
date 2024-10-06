@@ -1,8 +1,9 @@
+# utils/trailer_utils.py
+
 from typing import Optional
 
 import googleapiclient.discovery
 import requests
-from django.conf import settings
 
 from sync.models.movie import Movie
 from utils.logger_utils import setup_logging
