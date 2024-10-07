@@ -9,24 +9,20 @@ from sync.models import Genre, Movie
 class RandomMovieFormTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        # Create some test data
         genre1 = Genre.objects.create(name="Action")
         genre2 = Genre.objects.create(name="Comedy")
-
-        # Create movies with unique plex_key values
         movie1 = Movie.objects.create(
             title="Test Movie 1",
             year=2020,
-            duration=7200000,  # 2 hours
+            duration=7200000,
             rotten_tomatoes_rating=85,
             plex_key="movie1",
         )
         movie1.genres.add(genre1)
-
         movie2 = Movie.objects.create(
             title="Test Movie 2",
             year=2021,
-            duration=5400000,  # 1.5 hours
+            duration=5400000,
             rotten_tomatoes_rating=75,
             plex_key="movie2",
         )

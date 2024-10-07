@@ -54,7 +54,7 @@ Plex Picker is a Django-based web application that helps users randomly select m
 6. **Populate the Database**  
    Use the following command to sync your Plex "Movies" library and populate the database.
    ```bash
-   python manage.py sync_movies
+   python manage.py sync_media
    ```
 
 7. **Run the Development Server**  

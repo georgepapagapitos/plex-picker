@@ -1,6 +1,6 @@
 // static/js/plex_content.js
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     const moviesList = document.getElementById("movie-list");
     const showsList = document.getElementById("show-list");
     const searchForm = document.getElementById("search-form");
@@ -8,49 +8,51 @@ document.addEventListener("DOMContentLoaded", function() {
     const searchInput = document.querySelector('input[name="query"]');
 
     function fetchContent(url, params) {
-        const xhr = new XMLHttpRequest();
-        xhr.open("GET", `${url}?${params.toString()}`, true);
-        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                try {
-                    const response = JSON.parse(xhr.responseText);
-                    updateContent(response);
-                } catch (e) {
-                    console.error("Error parsing JSON response:", e);
-                }
-            } else {
-                console.error("Failed to fetch data:", xhr.statusText);
+        console.log('Fetching content:', url, params);
+        fetch(`${url}?${new URLSearchParams(params)}`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
             }
-        };
-        xhr.onerror = function() {
-            console.error("Network error occurred");
-        };
-        xhr.send();
+        })
+            .then(response => {
+                console.log('Response received:', response);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(text => {
+                console.log('Raw response:', text);
+                try {
+                    const data = JSON.parse(text);
+                    console.log('Data received:', data);
+                    updateContent(data);
+                } catch (error) {
+                    console.error('Error parsing JSON:', error);
+                    console.log('Received non-JSON response.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
     }
 
     function updateContent(response) {
         if (moviesList) {
             updateList(moviesList, response.movies, 'movie', response.movie_page, response.movie_total_pages);
-        } else {
-            console.error("Movies list element not found");
         }
         if (showsList) {
             updateList(showsList, response.shows, 'show', response.show_page, response.show_total_pages);
-        } else {
-            console.error("Shows list element not found");
         }
     }
 
     function updateList(listElement, items, type, currentPage, totalPages) {
-        if (!listElement) {
-            console.error(`List element for ${type} not found`);
-            return;
-        }
         listElement.innerHTML = items.map(item => `
             <li class="bg-gray-800 rounded-md p-3 hover:bg-gray-700 transition duration-150">
-                <a href="/${type}s/${item.id}/" class="text-blue-400 hover:text-blue-300">${item.title}</a>
-                <span class="text-gray-400">(${item.year})</span>
+                <a href="/${type}s/${item.pk}/" class="text-blue-400 hover:text-blue-300">${item.fields.title}</a>
+                <span class="text-gray-400">(${item.fields.year})</span>
             </li>
         `).join("");
 
@@ -78,10 +80,12 @@ document.addEventListener("DOMContentLoaded", function() {
         html += '</span>';
 
         paginationElement.innerHTML = html;
+        attachPaginationListeners(paginationElement);
+    }
 
-        // Reattach event listeners to pagination links
+    function attachPaginationListeners(paginationElement) {
         paginationElement.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', function(event) {
+            link.addEventListener('click', function (event) {
                 event.preventDefault();
                 const page = this.getAttribute('data-page');
                 const paginationType = this.getAttribute('data-type');
@@ -97,21 +101,32 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // Reset button functionality
-    resetButton.addEventListener('click', function(event) {
+    resetButton.addEventListener('click', function (event) {
         event.preventDefault();
         searchInput.value = '';
-        fetchContent(window.location.pathname, new URLSearchParams());
+        fetchContent(window.location.pathname, {});
         history.pushState({}, '', window.location.pathname);
     });
 
     // Handle form submission
-    searchForm.addEventListener('submit', function(event) {
+    searchForm.addEventListener('submit', function (event) {
         event.preventDefault();
         const params = new URLSearchParams(new FormData(searchForm));
         fetchContent(window.location.pathname, params);
         history.pushState({}, '', `${window.location.pathname}?${params.toString()}`);
     });
 
-    // Initial load
-    fetchContent(window.location.pathname, new URLSearchParams(window.location.search));
+    // Attach pagination listeners to existing pagination elements
+    document.querySelectorAll('.movie-pagination, .show-pagination').forEach(attachPaginationListeners);
+
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', function (event) {
+        fetchContent(window.location.pathname, new URLSearchParams(window.location.search));
+    });
+
+    // Only fetch content if there are search parameters or pagination
+    if (window.location.search) {
+        console.log('Triggering initial load due to search parameters');
+        fetchContent(window.location.pathname, new URLSearchParams(window.location.search));
+    }
 });

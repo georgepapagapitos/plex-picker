@@ -18,7 +18,7 @@ class GenreModelTest(TestCase):
             Genre.objects.create(name="Comedy")
 
     def test_genre_max_length(self):
-        long_name = "A" * 101  # 101 characters
+        long_name = "A" * 101
         with self.assertRaises(ValidationError):
             genre = Genre(name=long_name)
             genre.full_clean()

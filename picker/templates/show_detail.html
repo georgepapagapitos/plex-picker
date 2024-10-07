@@ -1,14 +1,14 @@
 <!-- picker/templates/show_detail.html -->
+
 {% extends "base.html" %}
 {% load static %}
-
-{% block title %}{{ show.title }}{% endblock title %}
+{% block title %}{{ media.title }}{% endblock title %}
 
 {% block content %}
     <div class="relative min-h-full bg-gray-900">
     <!-- Fixed position background image -->
         <div class="fixed inset-0 z-0">
-            <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('{{ media.art }}');"></div>
+            <div class="absolute inset-0 bg-cover bg-center lazyload-bg" data-bg="{{ media.optimized_art.url|default:media.art }}"></div>
             <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/90 to-gray-900/50"></div>
         </div>
     <!-- Scrollable content -->
@@ -57,6 +57,6 @@
     {% include "partials/_trailer_modal.html" %}
 {% endblock content %}
 
-{% block extra_js %}
+{% block script %}
     <script src="{% static 'js/modal.js' %}"></script>
-{% endblock extra_js %}
+{% endblock script %}

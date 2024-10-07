@@ -13,17 +13,14 @@ class RandomMovieViewTests(TestCase):
         action = Genre.objects.create(name="Action")
         comedy = Genre.objects.create(name="Comedy")
         drama = Genre.objects.create(name="Drama")
-
         cls.movie1 = Movie.objects.create(
             title="Movie 1", tmdb_id=1, plex_key="plex_key_1"
         )
         cls.movie1.genres.set([action, comedy])
-
         cls.movie2 = Movie.objects.create(
             title="Movie 2", tmdb_id=2, plex_key="plex_key_2"
         )
         cls.movie2.genres.set([action])
-
         cls.movie3 = Movie.objects.create(
             title="Movie 3", tmdb_id=3, plex_key="plex_key_3"
         )

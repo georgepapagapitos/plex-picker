@@ -11,7 +11,6 @@ class ShowModelTests(TestCase):
         cls.action = Genre.objects.create(name="Action")
         cls.sci_fi = Genre.objects.create(name="Science Fiction")
         cls.drama = Genre.objects.create(name="Drama")
-
         cls.show = Show.objects.create(
             title="Stranger Things",
             summary="A group of kids uncover supernatural mysteries.",

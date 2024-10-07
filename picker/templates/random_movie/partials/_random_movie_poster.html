@@ -1,8 +1,6 @@
 <!-- picker/templates/random_movie/partials/_random_movie_poster.html -->
 
-<img
-    src="{{ movie.poster_url }}"
-    alt="{{ movie.title }} poster"
-    class="w-full h-full object-cover rounded-lg shadow-lg"
-    loading="lazy"
-/>
+<picture>
+    <source srcset="{{ movie.optimized_poster.url }}" type="image/webp">
+    <img data-src="{{ movie.poster_url }}" alt="{{ movie.title }} poster" class="lazyload w-full rounded-lg shadow-lg hover:opacity-80 transition-opacity duration-300" width="300" height="450"/>
+</picture>
