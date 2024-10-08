@@ -1,18 +1,40 @@
 <!-- picker/templates/random_movie/partials/_random_movie_filter_form.html -->
 
 {% load add_class %}
-<form id="movieFilterForm" method="get" action="{% url 'random_movie' %}" class="mb-8 bg-gray-800 p-6 rounded-lg shadow-lg">
-    <div class="flex flex-wrap align-center gap-4">
-        {% for field in form %}
-            <div class="flex flex-col">
-                {{ field.label_tag }}
-                {{ field|add_class:"bg-gray-700 text-gray-200 placeholder-gray-400 border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500" }}
-            </div>
-        {% endfor %}
-        <input type="hidden" name="randomize" value="true">
-        <input type="hidden" name="movies" value="{{ movie_ids }}">
 
-        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Pick Random Movies</button>
-        <button type="submit" name="reset" value="true" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Reset Filters</button>
+<form id="movieFilterForm" method="get" action="{% url 'random_movie' %}" class="mb-8 bg-gray-800 p-6">
+    <div class="flex flex-col gap-4">
+        <div class="flex flex-wrap gap-4">
+            {% for field in form %}
+                {% if field.name != 'min_year' and field.name != 'max_year' %}
+                    <div class="flex flex-col">
+                        {{ field.label_tag }}
+                        {% if field.name == 'genre' %}
+                            {{ field|add_class:"js-genre-select w-full bg-gray-700 text-gray-200 border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500" }}
+                        {% else %}
+                            {{ field|add_class:"w-full bg-gray-700 text-gray-200 border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500" }}
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="flex gap-4">
+            <div class="flex flex-col flex-1">
+                {{ form.min_year.label_tag }}
+                {{ form.min_year|add_class:"w-full bg-gray-700 text-gray-200 border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500" }}
+            </div>
+            <div class="flex flex-col flex-1">
+                {{ form.max_year.label_tag }}
+                {{ form.max_year|add_class:"w-full bg-gray-700 text-gray-200 border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500" }}
+            </div>
+        </div>
+
+        <div class="flex gap-4 mt-4">
+            <input type="hidden" name="randomize" value="true">
+            <input type="hidden" name="movies" value="{{ movie_ids }}">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Pick Random Movies</button>
+            <button type="submit" name="reset" value="true" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Reset Filters</button>
+        </div>
     </div>
 </form>

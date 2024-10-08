@@ -3,7 +3,7 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
     <head>
         <meta charset="UTF-8">
         <meta name="description" content="plexpicker"/>
@@ -13,41 +13,63 @@
         <link href="{% static 'css/dist/styles.css' %}" rel="stylesheet">
         {% block extra_head %}{% endblock extra_head %}
     </head>
-    <body class="flex flex-col h-full bg-gray-900 text-gray-200">
-
+    <body class="flex flex-col h-screen bg-gray-900 text-gray-200">
         <!-- Fixed Header -->
-        <header class="fixed top-0 left-0 right-0 z-50 bg-gray-800 text-white shadow-md">
+        <header class="bg-gray-800 text-white shadow-md z-20">
             <div class="flex justify-between items-center px-4 py-4">
+            <!-- Hamburger menu for mobile -->
+                <button id="sidebarToggle" class="text-white lg:hidden">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
                 <a href="{% url 'plex_content' %}" class="text-2xl font-bold text-gray-200 hover:text-white">
                     PlexPicker
                 </a>
-
                 <!-- Optional Navigation -->
                 {% block nav %}
-                    <nav class="space-x-4">
+                    {% comment %} <nav class="space-x-4 hidden lg:block">
                         <a href="{% url 'plex_content' %}" class="text-gray-300 hover:text-white">Home</a>
                         <a href="{% url 'random_movie' %}" class="text-gray-300 hover:text-white">Random Movie</a>
-                    </nav>
+                    </nav> {% endcomment %}
                 {% endblock nav %}
             </div>
         </header>
-
-        <!-- Main content -->
-        <main class="flex-grow mt-16"> <!-- Added mt-16 to account for fixed header -->
-            {% block content %}
-            <!-- Default content if no block is defined -->
-            {% endblock content %}
-        </main>
-
+        <!-- Main content with sidebar -->
+        <div class="flex flex-grow overflow-hidden">
+            <!-- Sidebar -->
+            <aside id="sidebar" class="fixed top-16 bottom-0 left-0 w-64 bg-gray-800 text-gray-100 overflow-y-auto transition-transform duration-300 ease-in-out transform -translate-x-full lg:translate-x-0 z-40">
+                <div class="p-4">
+                    {% block sidebar %}
+                        <!-- Default sidebar content -->
+                        <ul>
+                            <li><a href="{% url 'plex_content' %}" class="block py-2 hover:text-white font-semibold">Home</a></li>
+                            <li><a href="{% url 'random_movie' %}" class="block py-2 hover:text-white font-semibold">Random Movie</a></li>
+                            <!-- Add more menu items as needed -->
+                        </ul>
+                    {% endblock sidebar %}
+                </div>
+            </aside>
+            <!-- Main content area -->
+            <main class="flex-grow w-full lg:ml-64 overflow-x-hidden">
+                {% block full_width_content %}
+                    <div class="h-full p-6">
+                        {% block content %}
+                        <!-- Default content if no block is defined -->
+                        {% endblock content %}
+                    </div>
+                {% endblock full_width_content %}
+            </main>
+        </div>
         <!-- Footer -->
-        <footer class="bg-gray-800 text-gray-400 py-4">
+        {% comment %} <footer class="bg-gray-800 text-gray-400 px-4 py-4 shadow-lg" >
             <div class="mx-auto text-center">
-                <p>©2024 PlexPicker. All rights reserved.</p>
+                <p>©2024 PlexPicker</p>
             </div>
-        </footer>
-
+        </footer> {% endcomment %}
         <script src="{% static 'js/modal.js' %}" defer></script>
         <script src="{% static 'js/lazyload.js' %}" defer></script>
+        <script src="{% static 'js/sidebar.js' %}" defer></script>
         {% block script %}{% endblock script %}
     </body>
 </html>

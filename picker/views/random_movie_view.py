@@ -1,12 +1,13 @@
 # picker/views/random_movie_view.py
 
+from django.db.models import Count
 from django.http import HttpRequest, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.urls import reverse
 
 from picker.forms import RandomMovieForm
-from picker.helpers.movie_helpers import get_filtered_movies, get_random_movies
+from picker.helpers.movie_helpers import get_random_movies
 from sync.models import Movie
 from utils.logger_utils import setup_logging
 
@@ -23,7 +24,7 @@ def random_movie_view(request: HttpRequest):
             return HttpResponseRedirect(reverse("random_movie"))
 
         # Get parameters with default values
-        selected_genre = form.data.get("genre", "")
+        selected_genres = [genre for genre in request.GET.getlist("genre") if genre]
         count = max(1, min(int(form.data.get("count", 1)), 4))  # Limit count to max 4
         selected_rating = form.data.get("min_rotten_tomatoes_rating", "")
         selected_duration = form.data.get("max_duration", "")
@@ -34,7 +35,15 @@ def random_movie_view(request: HttpRequest):
 
         if randomize or not movie_ids:
             # If randomizing or no movie IDs provided, filter and select movies
-            movies = Movie.objects.filter(get_filtered_movies(selected_genre))
+            movies = Movie.objects.all()
+
+            if selected_genres:
+                # Filter movies that have all selected genres
+                movies = (
+                    movies.filter(genres__name__in=selected_genres)
+                    .annotate(num_genres=Count("genres"))
+                    .filter(num_genres=len(selected_genres))
+                )
 
             # Filter by the minimum rotten tomatoes rating if specified
             if selected_rating.isdigit():
@@ -62,8 +71,9 @@ def random_movie_view(request: HttpRequest):
                         movie.summary = movie.summary[:100] + "..."
 
                 # Redirect to the same view with selected movie IDs in the URL
+                genres_param = "&".join([f"genre={genre}" for genre in selected_genres])
                 return HttpResponseRedirect(
-                    f"{reverse('random_movie')}?genre={selected_genre}&count={count}&movies={movie_ids}"
+                    f"{reverse('random_movie')}?{genres_param}&count={count}&movies={movie_ids}"
                     f"&min_rotten_tomatoes_rating={selected_rating}&max_duration={selected_duration}"
                     f"&min_year={selected_min_year}&max_year={selected_max_year}"
                 )
@@ -95,7 +105,7 @@ def random_movie_view(request: HttpRequest):
         context = {
             "form": form,
             "movies": selected_movies,
-            "selected_genre": selected_genre,
+            "selected_genres": selected_genres,
             "count": count,
             "movie_ids": movie_ids,
             "min_rotten_tomatoes_rating": selected_rating,
