@@ -43,8 +43,8 @@
                     {% block sidebar %}
                         <!-- Default sidebar content -->
                         <ul>
-                            <li><a href="{% url 'plex_content' %}" class="block py-2 hover:text-white font-semibold">Home</a></li>
-                            <li><a href="{% url 'random_movie' %}" class="block py-2 hover:text-white font-semibold">Random Movie</a></li>
+                            <li><a href="{% url 'plex_content' %}" class="block py-2 text-gray-200 font-semibold hover:underline hover:text-white">Home</a></li>
+                            <li><a href="{% url 'random_movie' %}" class="block py-2 text-gray-200 font-semibold hover:underline hover:text-white">Random Movie</a></li>
                             <!-- Add more menu items as needed -->
                         </ul>
                     {% endblock sidebar %}
