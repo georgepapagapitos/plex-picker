@@ -1,5 +1,6 @@
 # tests/picker/test_random_movie_form.py
 
+from django.http import QueryDict
 from django.test import TestCase
 
 from picker.forms.random_movie_form import RandomMovieForm
@@ -97,13 +98,13 @@ class RandomMovieFormTest(TestCase):
         self.assertTrue(form.is_reset())
 
     def test_form_initial_values(self):
-        form = RandomMovieForm(data={"genre": "Action", "count": "2"})
-        self.assertEqual(form.fields["genre"].initial, "Action")
+        form = RandomMovieForm(data={"genre": ["Action", "Comedy"], "count": "2"})
+        self.assertEqual(form.fields["genre"].initial, ["Action", "Comedy"])
         self.assertEqual(form.fields["count"].initial, "2")
 
     def test_form_validation(self):
         form_data = {
-            "genre": "Action",
+            "genre": ["Action", "Comedy"],
             "count": "2",
             "min_rotten_tomatoes_rating": "75",
             "max_duration": "120",
@@ -115,7 +116,7 @@ class RandomMovieFormTest(TestCase):
 
     def test_form_validation_with_empty_fields(self):
         form_data = {
-            "genre": "",
+            "genre": [],
             "count": "1",
             "min_rotten_tomatoes_rating": "",
             "max_duration": "",
@@ -140,3 +141,20 @@ class RandomMovieFormTest(TestCase):
         self.assertIsNone(form.cleaned_data["max_duration"])
         self.assertIsNone(form.cleaned_data["min_year"])
         self.assertIsNone(form.cleaned_data["max_year"])
+
+    def test_multiple_genre_selection(self):
+        form = RandomMovieForm(data={"genre": ["Action", "Comedy"], "count": "1"})
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data["genre"], ["Action", "Comedy"])
+
+    def test_form_initial_values_single_genre(self):
+        form = RandomMovieForm(data={"genre": "Action", "count": "2"})
+        self.assertEqual(form.fields["genre"].initial, ["Action"])
+        self.assertEqual(form.fields["count"].initial, "2")
+
+    def test_form_with_querydict(self):
+        query_dict = QueryDict("genre=Action&genre=Comedy&count=2")
+        form = RandomMovieForm(data=query_dict)
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data["genre"], ["Action", "Comedy"])
+        self.assertEqual(form.cleaned_data["count"], "2")

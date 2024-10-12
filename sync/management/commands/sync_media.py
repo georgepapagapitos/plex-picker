@@ -11,6 +11,7 @@ from django.db import OperationalError, transaction
 from django.utils.timezone import make_aware
 from plexapi.server import PlexServer
 
+from sync.helpers import fetch_movie_links
 from sync.models import Episode, Genre, Movie, Person, Role, Show, Studio
 from utils.logger_utils import setup_logging
 from utils.trailer_utils import TrailerFetcher
@@ -113,13 +114,17 @@ class Command(BaseCommand):
     def process_roles(self, plex_media, content_object):
         try:
             roles_count = 0
-            for plex_role in plex_media.roles:
+            for order, plex_role in enumerate(plex_media.roles):
                 person = self.get_or_create_person(plex_role)
                 character_name = self.extract_character_name(
                     plex_role, plex_media.title
                 )
 
-                role_data = {"character_name": character_name, "role_type": "ACTOR"}
+                role_data = {
+                    "character_name": character_name,
+                    "role_type": "ACTOR",
+                    "order": order,
+                }
 
                 if isinstance(content_object, Movie):
                     role_data["movie"] = content_object
@@ -176,6 +181,13 @@ class Command(BaseCommand):
         )
         self.process_genres(plex_movie, movie)
         self.process_roles(plex_movie, movie)
+
+        # Fetch and update movie links
+        tmdb_url, trakt_url, imdb_url = fetch_movie_links(movie)
+        movie.tmdb_url = tmdb_url
+        movie.trakt_url = trakt_url
+        movie.imdb_url = imdb_url
+        movie.save()
 
         if created or not movie.trailer_url:
             try:
@@ -286,6 +298,7 @@ class Command(BaseCommand):
             "last_viewed_at": (
                 make_aware(plex_movie.lastViewedAt) if plex_movie.lastViewedAt else None
             ),
+            "guid": plex_movie.guid,
         }
 
     def extract_show_data(self, plex_show):

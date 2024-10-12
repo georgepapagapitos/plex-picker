@@ -11,7 +11,15 @@ from sync.models.genre import Genre
 
 class RandomMovieForm(forms.Form):
     GENRE_CHOICES = [("", "Any")]
-    genre = forms.ChoiceField(choices=GENRE_CHOICES, required=False)
+    genre = forms.MultipleChoiceField(
+        choices=GENRE_CHOICES,
+        required=False,
+        widget=forms.SelectMultiple(
+            attrs={
+                "class": "bg-gray-700 text-gray-200 placeholder-gray-400 border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            }
+        ),
+    )
     count = forms.ChoiceField(choices=[(i, str(i)) for i in range(1, 5)], initial=1)
     min_rotten_tomatoes_rating = forms.ChoiceField(required=False)
     max_duration = forms.ChoiceField(required=False)
@@ -37,9 +45,9 @@ class RandomMovieForm(forms.Form):
         )
         # Extend the choices with unique genres that have movies
         self.fields["genre"].choices += [(genre, genre) for genre in genres_with_movies]
-        # Set rating choices including "Any"
+
+        # Set other field choices
         self.fields["min_rotten_tomatoes_rating"].choices = self.get_rating_choices()
-        # Set duration choices including "Any"
         self.fields["max_duration"].choices = self.get_duration_choices()
         self.fields["min_year"].choices = self.get_year_choices()
         self.fields["max_year"].choices = self.get_year_choices()
@@ -47,7 +55,18 @@ class RandomMovieForm(forms.Form):
         if self.data and "reset" not in self.data:
             for field in self.fields:
                 if field in self.data:
-                    self.fields[field].initial = self.data[field]
+                    if field == "genre":
+                        # Handle both list and string inputs for genre
+                        value = (
+                            self.data.get(field)
+                            if isinstance(self.data, dict)
+                            else self.data.getlist(field)
+                        )
+                        self.fields[field].initial = (
+                            value if isinstance(value, list) else [value]
+                        )
+                    else:
+                        self.fields[field].initial = self.data.get(field)
 
     def clean_min_rotten_tomatoes_rating(self):
         value = self.cleaned_data.get("min_rotten_tomatoes_rating")

@@ -30,7 +30,7 @@ class FormattedActorsMixin:
         actor_roles = (
             self.roles.filter(role_type="ACTOR")
             .select_related("person")
-            .order_by("person__last_name", "person__first_name")
+            .order_by("order", "id")
         )
         if limit:
             actor_roles = actor_roles[:limit]
