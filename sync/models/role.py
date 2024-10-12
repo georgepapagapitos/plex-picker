@@ -27,11 +27,13 @@ class Role(models.Model):
         "Episode", on_delete=models.CASCADE, null=True, blank=True, related_name="roles"
     )
     character_name = models.CharField(max_length=255, blank=True, null=True)
+    order = models.PositiveIntegerField(default=0)
 
     class Meta:
         indexes = [
             models.Index(fields=["role_type"]),
         ]
+        ordering = ["order", "id"]
 
     def __str__(self):
         media = self.movie or self.show or self.episode

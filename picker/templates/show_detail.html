@@ -1,13 +1,15 @@
+<!-- picker/templates/show_detail.html -->
+
 {% extends "base.html" %}
 {% load static %}
 {% block title %}{{ media.title }}{% endblock title %}
 {% block full_width_content %}
     <div class="relative min-h-screen bg-gray-900">
-    <!-- Background image with adjusted gradient overlay -->
+        <!-- Background image with adjusted gradient overlay -->
         <div class="fixed inset-0 bg-cover bg-center lazyload-bg" data-bg="{{ media.optimized_art.url|default:media.art }}">
             <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/90 to-gray-900/50"></div>
         </div>
-    <!-- Content -->
+        <!-- Content -->
         <div class="relative z-10 pt-4 px-4 sm:px-6 lg:px-8">
             <div class="max-w-7xl mx-auto">
                 {% include "partials/_media_header.html" with media=media %}

@@ -47,6 +47,9 @@ class Movie(
     originally_available_at = models.DateField(null=True, blank=True)
     rating_image = models.CharField(max_length=255, null=True, blank=True)
     view_count = models.IntegerField(default=0)
+    tmdb_url = models.URLField(null=True, blank=True)
+    trakt_url = models.URLField(null=True, blank=True)
+    imdb_url = models.URLField(null=True, blank=True)
 
     # Metadata fields
     added_at = models.DateTimeField(null=True, blank=True)

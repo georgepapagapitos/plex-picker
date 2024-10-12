@@ -6,7 +6,7 @@
     <div class="flex flex-col gap-4">
         <div class="flex flex-wrap gap-4">
             {% for field in form %}
-                {% if field.name != 'min_year' and field.name != 'max_year' %}
+                {% if field.name != 'min_year' and field.name != 'max_year' and field.name != 'count' and field.name != 'max_duration' %}
                     <div class="flex flex-col">
                         {{ field.label_tag }}
                         {% if field.name == 'genre' %}
@@ -17,6 +17,17 @@
                     </div>
                 {% endif %}
             {% endfor %}
+        </div>
+
+        <div class="flex gap-4">
+            <div class="flex flex-col flex-1">
+                {{ form.count.label_tag }}
+                {{ form.count|add_class:"w-full bg-gray-700 text-gray-200 border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500" }}
+            </div>
+            <div class="flex flex-col flex-1">
+                {{ form.max_duration.label_tag }}
+                {{ form.max_duration|add_class:"w-full bg-gray-700 text-gray-200 border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500" }}
+            </div>
         </div>
 
         <div class="flex gap-4">
@@ -33,7 +44,8 @@
         <div class="flex gap-4 mt-4">
             <input type="hidden" name="randomize" value="true">
             <input type="hidden" name="movies" value="{{ movie_ids }}">
+            <button type="submit" name="reset" value="true" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded h-10">Reset</button>
             <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded h-10">Randomize</button>
-            <button type="submit" name="reset" value="true" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded h-10">Reset</button></div>
+        </div>
     </div>
 </form>
