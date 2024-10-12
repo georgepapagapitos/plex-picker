@@ -6,23 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('sync', '0007_alter_role_options_role_order'),
+        ("sync", "0007_alter_role_options_role_order"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='movie',
-            name='imdb_url',
+            model_name="movie",
+            name="imdb_url",
             field=models.URLField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='movie',
-            name='tmdb_url',
+            model_name="movie",
+            name="tmdb_url",
             field=models.URLField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='movie',
-            name='trakt_url',
+            model_name="movie",
+            name="trakt_url",
             field=models.URLField(blank=True, null=True),
         ),
     ]
