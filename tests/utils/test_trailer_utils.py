@@ -6,8 +6,8 @@ import requests
 from django.conf import settings
 from django.test import TestCase, override_settings
 
-from sync.models.genre import Genre
-from sync.models.movie import Movie
+from apps.sync.models.genre import Genre
+from apps.sync.models.movie import Movie
 from utils.trailer_utils import TrailerFetcher
 
 

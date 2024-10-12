@@ -5,7 +5,7 @@ from unittest.mock import patch
 from django.db import IntegrityError
 from django.test import TestCase
 
-from sync.models.genre import Genre
+from apps.sync.models.genre import Genre
 from utils.genre_utils import get_or_create_genres
 
 

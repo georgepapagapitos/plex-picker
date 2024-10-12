@@ -1,0 +1,21 @@
+<!-- apps/picker/templates/movie_detail.html -->
+
+{% extends "base.html" %}
+{% block title %}{{ movie.title }}{% endblock title %}
+{% block full_width_content %}
+    <div class="relative min-h-screen bg-gray-900">
+        <!-- Background image with adjusted gradient overlay -->
+        <div class="absolute inset-0 bg-cover bg-center lazyload-bg" data-bg="{{ movie.optimized_art.url|default:movie.art }}">
+            <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/90 to-gray-900/50"></div>
+        </div>
+        <!-- Content -->
+        <div class="relative z-10 pt-4 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto">
+                {% include "partials/_media_header.html" with media=movie %}
+                {% include "partials/_media_summary.html" with media=movie formatted_actors=formatted_actors %}
+                {% include "partials/_back_links.html" %}
+            </div>
+        </div>
+    </div>
+    {% include "partials/_trailer_modal.html" %}
+{% endblock full_width_content %}
