@@ -1,0 +1,16 @@
+<!-- picker/templates/partials/_cast_photos.html -->
+
+{% if cast_with_photos %}
+    <div class="mb-4">
+        <h4>
+            <a href="{% url 'movie_cast' movie.id %}" class="font-bold text-gray-300 hover:text-gray-100">
+                Cast <span class="ml-1">&rarr;</span>
+            </a>
+        </h4>
+        <div class="flex flex-wrap gap-4 mt-2">
+            {% for cast_member in cast_with_photos %}
+                {% include "partials/_cast_photo.html" with cast_member=cast_member %}
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}

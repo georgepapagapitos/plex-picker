@@ -1,0 +1,18 @@
+<!-- picker/templates/person_detail_content.html -->
+
+<div id="contentContainer">
+    {% if movies %}
+        <h2 class="text-2xl font-bold text-white mb-4">Movies</h2>
+        <div id="movieGrid">
+            {% include "random_movie/partials/_random_movie_grid.html" with movies=movies %}
+        </div>
+    {% endif %}
+    {% if shows %}
+        <h2 class="text-2xl font-bold text-white mb-4">TV Shows</h2>
+        <div id="showGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {% for show in shows %}
+                {% comment %} {% include "partials/_show_card.html" with show=show %} {% endcomment %}
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>

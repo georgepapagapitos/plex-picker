@@ -1,4 +1,4 @@
-# tests/picker/test_random_movie_view.py
+# picker/tests/test_random_movie_view.py
 
 from django.test import TestCase
 

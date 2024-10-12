@@ -1,4 +1,4 @@
-# tests/picker/test_plex_content_view.py
+# picker/tests/test_plex_content_view.py
 
 from unittest.mock import patch
 

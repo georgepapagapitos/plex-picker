@@ -1,6 +1,11 @@
 <!-- picker/templates/random_movie/partials/_random_movie_poster.html -->
 
 <picture>
-    <source srcset="{{ movie.optimized_poster.url }}" type="image/webp">
-    <img data-src="{{ movie.poster_url }}" alt="{{ movie.title }} poster" class="lazyload w-full rounded-lg shadow-lg hover:opacity-80 transition-opacity duration-300" width="300" height="450"/>
+    {% if movie.optimized_poster %}
+        <source srcset="{{ movie.safe_poster_url }}" type="image/webp">
+    {% endif %}
+    <img data-src="{{ movie.safe_poster_url }}"
+         alt="{{ movie.title }} poster"
+         class="lazyload w-full rounded-lg shadow-lg hover:opacity-80 transition-opacity duration-300"
+         width="300" height="450"/>
 </picture>

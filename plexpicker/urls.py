@@ -5,13 +5,14 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
-from picker.views.error_views import custom_404_view
+from picker.views import Custom404View
 
-handler404 = custom_404_view
+handler404 = Custom404View.as_view()
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("picker.urls")),
+    path("__reload__/", include("django_browser_reload.urls")),
 ]
 
 if settings.DEBUG:

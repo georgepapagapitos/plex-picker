@@ -1,4 +1,4 @@
-# tests/sync/test_movie_model.py
+# sync/tests/test_movie_model.py
 
 from django.test import TestCase
 

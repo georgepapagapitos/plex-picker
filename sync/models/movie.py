@@ -32,6 +32,7 @@ class Movie(
     plex_key = models.CharField(max_length=255, unique=True)
     trailer_url = models.URLField(null=True, blank=True)
     tmdb_id = models.PositiveIntegerField(null=True, blank=True)
+    imdb_id = models.CharField(max_length=10, null=True, blank=True, unique=True)
     rotten_tomatoes_rating = models.FloatField(null=True, blank=True)
     content_rating = models.CharField(max_length=10, null=True, blank=True)
     art = models.URLField(null=True, blank=True)
@@ -55,7 +56,6 @@ class Movie(
     added_at = models.DateTimeField(null=True, blank=True)
     updated_at = models.DateTimeField(null=True, blank=True)
     last_viewed_at = models.DateTimeField(null=True, blank=True)
-    # TODO: add guid to sync
     guid = models.CharField(max_length=255, null=True, blank=True)
 
     # Settings fields
@@ -73,6 +73,7 @@ class Movie(
         indexes = [
             models.Index(fields=["year"]),
             models.Index(fields=["tmdb_id"]),
+            models.Index(fields=["imdb_id"]),
         ]
 
     def __str__(self):
@@ -121,3 +122,7 @@ class Movie(
     @property
     def locations(self):
         return [media.file for media in self.media_set.all()]
+
+    @property
+    def actor_roles(self):
+        return self.roles.filter(role_type="ACTOR").select_related("person")

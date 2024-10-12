@@ -1,0 +1,21 @@
+<!-- picker/templates/partials/_cast_photo.html -->
+
+<div class="w-32 bg-gray-700 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
+  <a href="{% url 'person_detail' cast_member.person.id %}" class="block">
+    {% if cast_member.person.photo_url %}
+      <img src="{{ cast_member.person.photo_url }}" alt="{{ cast_member.person.full_name }}" class="w-full h-32 object-cover" width="128" height="128">
+    {% else %}
+      <div class="w-full h-32 bg-gray-600 flex items-center justify-center">
+        <span class="text-white text-xs">No photo</span>
+      </div>
+    {% endif %}
+    <div class="p-2 text-center">
+      <p class="text-sm text-white font-semibold leading-tight">{{ cast_member.person.full_name }}</p>
+      {% if cast_member.character_name %}
+        <p class="text-xs text-gray-400 leading-tight">as {{ cast_member.character_name }}</p>
+      {% else %}
+        <p class="text-xs text-gray-400 leading-tight">{{ cast_member.role_type }}</p>  <!-- Show role type here -->
+      {% endif %}
+    </div>
+  </a>
+</div>

@@ -2,13 +2,8 @@
 
 <div class="bg-gray-800 bg-opacity-80 p-6 rounded-lg shadow-lg mb-2">
     <p class="text-gray-200 mb-6">{{ media.summary }}</p>
-    {% if formatted_actors %}
-        <div class="mb-4">
-            <p class="font-semibold text-gray-300"><strong class="text-white">Cast: </strong>{{ formatted_actors }}</p>
-        </div>
-    {% endif %}
-    <p class="text-gray-200 mb-4"><strong class="text-white">Studio: </strong>{{ media.studio }}</p>
-
     {% include "partials/_rotten_tomatoes_rating.html" %}
-
+    <p class="text-gray-300 font-semibold mb-4"><strong class="text-white">Studio: </strong>{{ media.studio }}</p>
+    {% include "partials/_cast_photos.html" with cast_with_photos=actors_with_photos %}
+    {% include "partials/_external_links.html" with imdb_url=imdb_url tmdb_url=tmdb_url trakt_url=trakt_url %}
 </div>

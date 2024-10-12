@@ -1,4 +1,4 @@
-# tests/picker/test_movie_detail_view.py
+# picker/tests/test_movie_detail_view.py
 
 from unittest.mock import MagicMock, patch
 

@@ -1,4 +1,4 @@
-# tests/picker/test_movie_helpers.py
+# picker/tests/test_movie_helpers.py
 
 from unittest.mock import MagicMock, patch
 

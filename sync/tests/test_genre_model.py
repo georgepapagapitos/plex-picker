@@ -1,4 +1,4 @@
-# tests/sync/test_genre_model.py
+# sync/tests/test_genre_model.py
 
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError

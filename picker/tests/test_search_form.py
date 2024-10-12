@@ -1,4 +1,4 @@
-# tests/picker/test_search_form.py
+# picker/tests/test_search_form.py
 
 from django.test import TestCase
 

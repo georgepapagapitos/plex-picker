@@ -1,0 +1,23 @@
+<!-- picker/templates/partials/_external_links.html -->
+
+{% load static %}
+
+<div class="mt-6">
+    <div class="flex space-x-4">
+        {% if imdb_url %}
+            <a href="{{ imdb_url }}" target="_blank" rel="noopener noreferrer" class="flex items-center rounded-lg p-2 hover:bg-gray-700 transition duration-300">
+                <img src="{% static 'logos/imdb_logo.svg' %}" alt="IMDb" class="h-6 w-auto" width="24" height="24">
+            </a>
+        {% endif %}
+        {% if tmdb_url %}
+            <a href="{{ tmdb_url }}" target="_blank" rel="noopener noreferrer" class="flex items-center rounded-lg p-2 hover:bg-gray-700 transition duration-300">
+                <img src="{% static 'logos/tmdb_logo.svg' %}" alt="TMDB" class="h-6 w-auto" width="24" height="24">
+            </a>
+        {% endif %}
+        {% if trakt_url %}
+            <a href="{{ trakt_url }}" target="_blank" rel="noopener noreferrer" class="flex items-center rounded-lg p-2 hover:bg-gray-700 transition duration-300">
+                <img src="{% static 'logos/trakt_logo.svg' %}" alt="Trakt" class="h-6 w-auto" width="24" height="24">
+            </a>
+        {% endif %}
+    </div>
+</div>

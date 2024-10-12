@@ -3,17 +3,20 @@
 <div class="flex flex-col md:flex-row items-center md:items-start mb-8">
     {% if poster_link %}
         <a href="{% url 'movie_detail' media.id as movie_url %}{% url 'show_detail' media.id as show_url %}{% if media.type == 'movie' %}{{ movie_url }}{% else %}{{ show_url }}{% endif %}" class="block mt-2 w-2/6 md:w-1/4 mb-4 md:mb-0 md:mr-8">
-            <picture>
-                <source srcset="{{ media.optimized_poster.url }}" type="image/webp">
-                <img data-src="{{ media.poster_url }}" alt="{{ media.title }} poster" class="lazyload w-full rounded-lg shadow-lg hover:opacity-80 transition-opacity duration-300" width="300" height="450"/>
-            </picture>
-        </a>
     {% else %}
         <span class="block mt-2 w-2/6 md:w-1/4 mb-4 md:mb-0 md:mr-8">
-            <picture>
-                <source srcset="{{ media.optimized_poster.url }}" type="image/webp">
-                <img data-src="{{ media.poster_url }}" alt="{{ media.title }} poster" class="lazyload w-full rounded-lg shadow-lg" width="300" height="450"/>
-            </picture>
+    {% endif %}
+    <picture>
+        {% if optimized_poster_url %}
+            <source srcset="{{ optimized_poster_url }}" type="image/webp">
+            <img data-src="{{ optimized_poster_url }}" alt="{{ media.title }} poster" class="lazyload w-full rounded-lg shadow-lg{% if poster_link %} hover:opacity-80 transition-opacity duration-300{% endif %}" width="300" height="450"/>
+        {% else %}
+            <img data-src="{{ media.poster_url }}" alt="{{ media.title }} poster" class="lazyload w-full rounded-lg shadow-lg{% if poster_link %} hover:opacity-80 transition-opacity duration-300{% endif %}" width="300" height="450"/>
+        {% endif %}
+    </picture>
+    {% if poster_link %}
+        </a>
+    {% else %}
         </span>
     {% endif %}
     <div class="text-center md:text-left">
@@ -28,7 +31,12 @@
             <p><span class="text-gray-300">{{ media.formatted_genres }}</span></p>
         </div>
         {% if media.trailer_url %}
-            <a class="trailer-button bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded cursor-pointer" data-trailer-url="https://www.youtube.com/embed/{{ media.trailer_url|slice:'-11:' }}" data-movie-title="{{ media.title }}">Watch Trailer</a>
+            <p>
+                &#9658;
+                <a class="trailer-button text-white font-semibold cursor-pointer hover:underline" data-trailer-url="https://www.youtube.com/embed/{{ media.trailer_url|slice:'-11:' }}" data-movie-title="{{ media.title }}">
+                    Watch Trailer
+                </a>
+            </p>
         {% endif %}
         <div class="mt-8">
             <h2 class="text-xl italic">{{ media.tagline }}</h2>

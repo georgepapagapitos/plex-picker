@@ -1,4 +1,4 @@
-# sync/utils/movie_links.py
+# sync/helpers/movie_links.py
 
 import requests
 from django.conf import settings

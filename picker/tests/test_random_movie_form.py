@@ -1,4 +1,4 @@
-# tests/picker/test_random_movie_form.py
+# picker/tests/test_random_movie_form.py
 
 from django.http import QueryDict
 from django.test import TestCase

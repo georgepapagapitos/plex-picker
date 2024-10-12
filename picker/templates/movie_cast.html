@@ -1,0 +1,20 @@
+<!-- picker/templates/movie_cast -->
+
+{% extends "base.html" %}
+{% block title %}Cast of {{ movie.title }}{% endblock title %}
+
+{% block full_width_content %}
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-6">Cast of {{ movie.title }} ({{ movie.year }})</h1>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {% for cast_member in all_roles %}
+                {% include "partials/_cast_photo.html" with cast_member=cast_member %}
+            {% endfor %}
+        </div>
+
+        <a href="{% url 'movie_detail' movie.id %}" class="mt-8 inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Back to Movie
+        </a>
+    </div>
+{% endblock full_width_content %}

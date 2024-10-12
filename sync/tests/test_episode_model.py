@@ -1,4 +1,4 @@
-# tests/sync/test_episode_model.py
+# sync/tests/test_episode_model.py
 
 from django.forms import ValidationError
 from django.test import TestCase

@@ -1,6 +1,5 @@
 # sync/management/commands/optimize_existing_media.py
 
-
 from django.core.management.base import BaseCommand
 
 from sync.models import Movie, Show
