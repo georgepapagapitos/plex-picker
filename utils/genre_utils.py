@@ -4,7 +4,7 @@ from typing import List
 
 from django.db import IntegrityError
 
-from sync.models.genre import Genre
+from apps.sync.models.genre import Genre
 from utils.logger_utils import setup_logging
 
 logger = setup_logging(__name__)

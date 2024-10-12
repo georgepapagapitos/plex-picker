@@ -1,0 +1,14 @@
+<!-- apps/picker/templates/random_movie/partials/_random_movie_card.html -->
+
+{% load movie_tags %}
+
+<div class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 px-2 mb-4">
+    <div class="relative group h-full">
+        <a href="{% get_detail_url movie %}" class="block h-full">
+            <div class="relative">
+                {% include "random_movie/partials/_random_movie_poster.html" with movie=movie %}
+                {% include "random_movie/partials/_random_movie_info_overlay.html" with movie=movie %}
+            </div>
+        </a>
+    </div>
+</div>

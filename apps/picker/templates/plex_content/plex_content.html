@@ -1,0 +1,22 @@
+<!-- apps/picker/templates/plex_content.html -->
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Plex Content{% endblock title %}
+
+{% block content %}
+    <div class="min-h-screen bg-gray-900 pt-6 mb-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {% include "plex_content/partials/_plex_content_search_form.html" with search_form=search_form %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {% include "plex_content/partials/_plex_content_list.html" with title="Movies" items=movies_page empty_message="No movies found." url_name="movie_detail" page_type="movie" search_form=search_form %}
+                {% include "plex_content/partials/_plex_content_list.html" with title="TV Shows" items=shows_page empty_message="No TV shows found." url_name="show_detail" page_type="show" search_form=search_form %}
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block script %}
+    <script src="{% static 'js/plex_content.js' %}"></script>
+{% endblock script %}

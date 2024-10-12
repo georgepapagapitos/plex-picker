@@ -1,0 +1,48 @@
+<!-- apps/picker/templates/random_movie/random_movie.html -->
+
+{% extends "base.html" %}
+{% block title %}PlexPicker{% endblock title %}
+{% block sidebar %}
+    {% include "random_movie/partials/_random_movie_filter_form.html" %}
+{% endblock sidebar %}
+{% block content %}
+    <div class="min-h-screen bg-gray-900 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {% if movies %}
+                {% include "random_movie/partials/_random_movie_grid.html" %}
+                <div class="mt-8 flex justify-center lg:hidden"> <!-- Added lg:hidden here -->
+                    <button id="searchAgainButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Search Again
+                    </button>
+                </div>
+            {% else %}
+                <p class="text-white text-center">No movies found. Please adjust your filters and try again.</p>
+            {% endif %}
+        </div>
+    </div>
+    {% include "partials/_trailer_modal.html" %}
+{% endblock content %}
+
+{% block script %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchAgainButton = document.getElementById('searchAgainButton');
+            const movieFilterForm = document.getElementById('movieFilterForm');
+
+            if (searchAgainButton && movieFilterForm) {
+                searchAgainButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                // Set the randomize flag
+                    const randomizeInput = movieFilterForm.querySelector('input[name="randomize"]');
+                    if (randomizeInput) {
+                        randomizeInput.value = 'true';
+                    }
+
+                // Submit the form
+                    movieFilterForm.submit();
+                });
+            }
+        });
+    </script>
+{% endblock script %}

@@ -24,8 +24,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "picker",
-    "sync",
+    "apps.picker.apps.PickerConfig",
+    "apps.sync.apps.SyncConfig",
     "tailwind",
     "theme",
 ]
@@ -56,7 +56,7 @@ TEMPLATES = [
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [
             os.path.join(BASE_DIR, "templates"),
-            os.path.join(BASE_DIR, "picker/templates"),
+            os.path.join(BASE_DIR, "apps/picker/templates"),
         ],
         "APP_DIRS": True,
         "OPTIONS": {
@@ -114,3 +114,5 @@ TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
 TMDB_API_URL = os.getenv("TMDB_API_URL")
 TVDB_API_KEY = os.getenv("TVDB_API_KEY")
+TRAKT_CLIENT_ID = os.getenv("TRAKT_CLIENT_ID")
+TRAKT_CLIENT_SECRET = os.getenv("TRAKT_CLIENT_SECRET")
